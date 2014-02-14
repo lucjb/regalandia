@@ -1,7 +1,8 @@
 import java.util.List;
+import java.util.Set;
 
 public interface GiftRecommender<T> {
 
-	public List<GiftRecommendation<T>> recommend(List<GiftRecommendation<T>> previousRecommendations, int n);
+	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n);
 
 }

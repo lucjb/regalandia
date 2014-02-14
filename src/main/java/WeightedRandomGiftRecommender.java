@@ -1,52 +1,62 @@
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
+import com.google.common.collect.Sets;
 
 public class WeightedRandomGiftRecommender<T> implements GiftRecommender<T> {
 
 	private List<T> gifts;
-	private Random random = new Random();
+	private Random random = new Random(System.currentTimeMillis());
 	private UniformRandomGiftRecommender<T> start;
 	private KNNRetriever<T> knnRetriever;
 	private int k = 5;
 
-	public WeightedRandomGiftRecommender(List<T> gifts, KNNRetriever<T> knnRetriever) {
-		this.setGifts(gifts);
-		this.setStart(new UniformRandomGiftRecommender<T>(gifts));
-		this.setKnnRetriever(knnRetriever);
+	public WeightedRandomGiftRecommender(List<T> gifts,
+			SimilarityMeasure<T> similarityMeasure) {
+		this.setGifts(Lists.newArrayList(gifts));
+		this.setStart(new UniformRandomGiftRecommender<T>(this.getGifts()));
+		this.setKnnRetriever(new FullScanKNNRetriever<T>(this.getGifts(),
+				similarityMeasure));
 	}
 
 	@Override
-	public List<GiftRecommendation<T>> recommend(List<GiftRecommendation<T>> previousRecommendations, int n) {
-		if (previousRecommendations.isEmpty()) {
-			return this.getStart().recommend(previousRecommendations, n);
-		} else {
-			List<GiftRecommendation<T>> out = Lists.newArrayList();
-			ListMultimap<GiftRecommendation<T>, T> candidates = LinkedListMultimap.create();
-			double totalScore = 0;
-			for (GiftRecommendation<T> prevRec : previousRecommendations) {
-				List<T> retrieve = this.getKnnRetriever().retrieve(prevRec.getGift(), (int) (this.getK() * 1d / prevRec.getUserScore()));
-				candidates.putAll(prevRec, retrieve);
-				totalScore += prevRec.getUserScore();
-			}
-			for (GiftRecommendation<T> prevRec : previousRecommendations) {
-				int sampleSize = (int) (n * (prevRec.getUserScore() / totalScore));
-				for (int i = 0; i < sampleSize; i++) {
-					List<T> prevRecCandidates = candidates.get(prevRec);
-					T gift = prevRecCandidates.get(this.getRandom().nextInt(prevRecCandidates.size()));
-					prevRecCandidates.remove(gift);
-					out.add(new GiftRecommendation(gift, 1));
-				}
-			}
-			return out;
+	public Set<GiftRecommendation<T>> recommend(
+			Set<GiftRecommendation<T>> previousRecommendations, int n) {
+		Set<GiftRecommendation<T>> out = Sets.newHashSet();
+		ListMultimap<GiftRecommendation<T>, T> candidates = LinkedListMultimap
+				.create();
+		double totalScore = 0;
+		for (GiftRecommendation<T> prevRec : previousRecommendations) {
+			Double userScore = prevRec.getUserScore();
+			if (userScore.equals(0d))
+				continue;
+			int kn = (int) Math.round((this.getK() * 1d / userScore));
+			List<T> retrieve = this.getKnnRetriever().retrieve(
+					prevRec.getGift(), kn);
+			candidates.putAll(prevRec, retrieve);
+			totalScore += userScore;
+
 		}
+		for (GiftRecommendation<T> prevRec : previousRecommendations) {
+			int sampleSize = (int) Math.round((n - 1)
+					* (prevRec.getUserScore() / totalScore));
+
+			for (int i = 0; i < sampleSize; i++) {
+				List<T> prevRecCandidates = candidates.get(prevRec);
+				T gift = prevRecCandidates.get(this.getRandom().nextInt(
+						prevRecCandidates.size()));
+				prevRecCandidates.remove(gift);
+				out.add(new GiftRecommendation<T>(gift, 1));
+				this.getGifts().remove(gift);
+			}
+		}
+		out.addAll(this.getStart().recommend(previousRecommendations,
+				n - out.size()));
+		return out;
 
 	}
 

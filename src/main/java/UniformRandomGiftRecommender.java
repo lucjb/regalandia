@@ -1,7 +1,8 @@
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class UniformRandomGiftRecommender<T> implements GiftRecommender<T> {
 	private List<T> gifts;
@@ -12,10 +13,12 @@ public class UniformRandomGiftRecommender<T> implements GiftRecommender<T> {
 	}
 
 	@Override
-	public List<GiftRecommendation<T>> recommend(List<GiftRecommendation<T>> previousRecommendations, int n) {
-		List<GiftRecommendation<T>> recs = Lists.newArrayList();
+	public Set<GiftRecommendation<T>> recommend(
+			Set<GiftRecommendation<T>> previousRecommendations, int n) {
+		Set<GiftRecommendation<T>> recs = Sets.newHashSet();
 		for (int i = 0; i < n; i++) {
-			T gift = this.getGifts().get(this.getRandom().nextInt(this.getGifts().size()));
+			T gift = this.getGifts().get(
+					this.getRandom().nextInt(this.getGifts().size()));
 			recs.add(new GiftRecommendation<T>(gift, 1d));
 		}
 

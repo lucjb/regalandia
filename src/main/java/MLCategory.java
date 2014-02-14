@@ -25,6 +25,9 @@ public class MLCategory {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (!(obj instanceof MLCategory))
+			return false;
+
 		MLCategory other = (MLCategory) obj;
 		return this.id.equals(other.id);
 	}

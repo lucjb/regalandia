@@ -4,7 +4,7 @@ public class GiftRecommendation<T> {
 
 	private T gift;
 	private double recommenderScore;
-	private double userScore;
+	private Double userScore;
 
 	public GiftRecommendation(T gift, double recommenderScore) {
 		this.setGift(gift);
@@ -14,6 +14,19 @@ public class GiftRecommendation<T> {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof GiftRecommendation))
+			return false;
+		GiftRecommendation<T> other = (GiftRecommendation<T>) obj;
+		return this.getGift().equals(other.getGift());
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getGift().hashCode();
 	}
 
 	public T getGift() {
@@ -32,11 +45,11 @@ public class GiftRecommendation<T> {
 		this.recommenderScore = recommenderScore;
 	}
 
-	public double getUserScore() {
+	public Double getUserScore() {
 		return userScore;
 	}
 
-	public void setUserScore(double userScore) {
+	public void setUserScore(Double userScore) {
 		this.userScore = userScore;
 	}
 }
