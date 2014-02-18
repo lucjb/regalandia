@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -6,7 +7,7 @@ public class MLCategory {
 
 	private String id;
 	private String name;
-	private List<MLCategory> path_from_root;
+	private Set<MLCategory> path_from_root;
 
 	@Override
 	public String toString() {
@@ -48,11 +49,11 @@ public class MLCategory {
 		this.name = name;
 	}
 
-	public List<MLCategory> getPath_from_root() {
+	public Set<MLCategory> getPath_from_root() {
 		return path_from_root;
 	}
 
-	public void setPath_from_root(List<MLCategory> path_from_root) {
+	public void setPath_from_root(Set<MLCategory> path_from_root) {
 		this.path_from_root = path_from_root;
 	}
 

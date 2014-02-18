@@ -1,14 +1,19 @@
 import java.util.Collection;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 
-public class JaccardDistance<E> implements Metric<Collection<E>> {
-	
+import sun.text.normalizer.UBiDiProps;
+
+import com.google.common.collect.Sets;
+
+public class JaccardDistance<E> implements Metric<Set<E>> {
+
 	@Override
-	public double compute(Collection<E> x, Collection<E> y) {
-		Collection<E> intersection = CollectionUtils.intersection(x, y);
-		Collection<E> union = CollectionUtils.union(x, y);
-		return 1d - (double) intersection.size() / (double) union.size();
+	public double compute(Set<E> x, Set<E> y) {
+		double intersectionCardinality = Sets.intersection(x, y).size();
+		double unionCardinality = Sets.union(x, y).size();
+		return 1d - intersectionCardinality / unionCardinality;
 	}
 
 }

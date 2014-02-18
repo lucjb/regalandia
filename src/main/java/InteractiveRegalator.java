@@ -14,7 +14,8 @@ public class InteractiveRegalator {
 	public static void main(String[] args) throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
 
-		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
+		List<MLCategory> allMlCategories = mlCategoryParser
+				.parseMLCategories("all");
 
 		List<MLCategory> recommendableGifts = Lists.newArrayList();
 		for (MLCategory mlCategory : allMlCategories) {
@@ -23,15 +24,20 @@ public class InteractiveRegalator {
 			}
 		}
 
-		// WeightedRandomGiftRecommender<MLCategory> giftRecommender = new
-		// WeightedRandomGiftRecommender<MLCategory>(recommendableGifts, new
-		// MLCategoryPathJaccardIndex());
+		// WeightedRandomGiftRecommender<MLCategory>
+		// weightedRandomGiftRecommender = new
+		// WeightedRandomGiftRecommender<MLCategory>(
+		// recommendableGifts, new MLCategoryPathJaccardIndex());
 
-		WeightedKNNRegressionGiftRecommender<MLCategory> giftRecommender = new WeightedKNNRegressionGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
+		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(
+				recommendableGifts, new MLCategoryJaccardDistance());
+
+		GiftRecommender<MLCategory> giftRecommender = kernelRegressionBasedGiftRecommender;
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
-		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender.recommend(input, n);
+		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender
+				.recommend(input, n);
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 

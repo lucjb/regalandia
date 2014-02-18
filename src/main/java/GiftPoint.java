@@ -4,12 +4,13 @@ public class GiftPoint<T> {
 
 	private T gift;
 	private Double predictedScore;
-	private Integer uncertainty;
-
-	public GiftPoint(T gift, Double predictedScore, Integer uncertainty) {
+	private Double certainty;
+	private Double recommendability;
+	
+	public GiftPoint(T gift, Double predictedScore, Double certainty) {
 		this.setGift(gift);
 		this.setPredictedScore(predictedScore);
-		this.setUncertainty(uncertainty);
+		this.setCertainty(certainty);
 	}
 
 	@Override
@@ -47,12 +48,20 @@ public class GiftPoint<T> {
 		this.predictedScore = predictedScore;
 	}
 
-	public Integer getUncertainty() {
-		return uncertainty;
+	public Double getCertainty() {
+		return certainty;
 	}
 
-	public void setUncertainty(Integer uncertainty) {
-		this.uncertainty = uncertainty;
+	public void setCertainty(Double certainty) {
+		this.certainty = certainty;
+	}
+
+	public Double getRecommendability() {
+		return recommendability;
+	}
+
+	public void setRecommendability(Double recommendability) {
+		this.recommendability = recommendability;
 	}
 
 }
