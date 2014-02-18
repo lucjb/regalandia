@@ -23,11 +23,11 @@ public class InteractiveRegalator {
 			}
 		}
 
-		// WeightedRandomGiftRecommender<MLCategory> giftRecommender = new
-		// WeightedRandomGiftRecommender<MLCategory>(recommendableGifts, new
-		// MLCategoryPathJaccardIndex());
+		 WeightedRandomGiftRecommender<MLCategory> giftRecommender = new
+		 WeightedRandomGiftRecommender<MLCategory>(recommendableGifts, new
+		 MLCategoryPathJaccardIndex());
 
-		WeightedKNNRegressionGiftRecommender<MLCategory> giftRecommender = new WeightedKNNRegressionGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
+//		WeightedKNNRegressionGiftRecommender<MLCategory> giftRecommender = new WeightedKNNRegressionGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
