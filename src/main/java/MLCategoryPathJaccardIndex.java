@@ -10,4 +10,5 @@ public class MLCategoryPathJaccardIndex implements SimilarityMeasure<MLCategory>
 		return (double) intersection.size() / (double) union.size();
 	}
 
+
 }

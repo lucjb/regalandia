@@ -8,8 +8,7 @@ public class FullScanKNNRetriever<T> implements KNNRetriever<T> {
 	private List<T> gifts;
 	private SimilarityMeasure<T> similarityMeasure;
 
-	public FullScanKNNRetriever(List<T> gifts,
-			SimilarityMeasure<T> similarityMeasure) {
+	public FullScanKNNRetriever(List<T> gifts, SimilarityMeasure<T> similarityMeasure) {
 		this.setGifts(gifts);
 		this.setSimilarityMeasure(similarityMeasure);
 	}
@@ -18,16 +17,14 @@ public class FullScanKNNRetriever<T> implements KNNRetriever<T> {
 	public List<T> retrieve(final T x, int k) {
 		if (k < 0)
 			k = this.getGifts().size();
-		List<T> knn = Lists.newArrayList(Ordering.from(new Comparator<T>() {
+		Ordering<T> from = Ordering.from(new Comparator<T>() {
 			public int compare(T y, T z) {
-				double xyDistance = getSimilarityMeasure().computeSimilarity(x,
-						y);
-				double xzDistance = getSimilarityMeasure().computeSimilarity(x,
-						z);
+				double xyDistance = getSimilarityMeasure().computeSimilarity(x, y);
+				double xzDistance = getSimilarityMeasure().computeSimilarity(x, z);
 				return Double.compare(xyDistance, xzDistance);
 			};
-		}).greatestOf(this.getGifts(), k));
-		knn.remove(x);
+		});
+		List<T> knn = Lists.newArrayList(from.greatestOf(this.getGifts(), k));
 		return knn;
 	}
 

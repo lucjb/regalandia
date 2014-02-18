@@ -13,15 +13,13 @@ public class UniformRandomGiftRecommender<T> implements GiftRecommender<T> {
 	}
 
 	@Override
-	public Set<GiftRecommendation<T>> recommend(
-			Set<GiftRecommendation<T>> previousRecommendations, int n) {
+	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
 		Set<GiftRecommendation<T>> recs = Sets.newHashSet();
 		for (int i = 0; i < n; i++) {
-			T gift = this.getGifts().get(
-					this.getRandom().nextInt(this.getGifts().size()));
+			T gift = this.getGifts().get(this.getRandom().nextInt(this.getGifts().size()));
 			recs.add(new GiftRecommendation<T>(gift, 1d));
+			this.getGifts().remove(gift);
 		}
-
 		return recs;
 	}
 
