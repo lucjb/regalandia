@@ -1,9 +1,7 @@
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
@@ -27,10 +25,6 @@ public class InteractiveRegalator {
 		// weightedRandomGiftRecommender = new
 		// WeightedRandomGiftRecommender<MLCategory>(
 		// recommendableGifts, new MLCategoryPathJaccardIndex());
-		Random random = new Random();
-		int x = 1;
-		while (1 == x)
-			System.out.println(random.nextDouble());
 
 		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
 

@@ -5,20 +5,30 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class SimpleCategoricalProbabilityDistribution<T> implements CategoricalProbabilityDistribution<T> {
+public class SimpleCategoricalProbabilityDistribution<T> implements
+		CategoricalProbabilityDistribution<T> {
 
 	private Map<T, Double> upperBounds = Maps.newHashMap();
-	private List<T> sortedCategories;
+	private List<T> sortedCategories = Lists.newArrayList();
 	private Random random = new Random(System.currentTimeMillis());
 
-	public SimpleCategoricalProbabilityDistribution(Map<T, Double> pmf, Random random) {
+	public SimpleCategoricalProbabilityDistribution(Map<T, Double> pmf,
+			Random random) {
 		this.setRandom(random);
-		this.setSortedCategories(Lists.newArrayList(pmf.keySet()));
 		Double cum = 0d;
-		for (T t : sortedCategories) {
+		pmf.keySet();
+		for (T t : pmf.keySet()) {
 			Double pOfT = pmf.get(t);
-			this.getUpperBounds().put(t, cum + pOfT);
-			cum += pOfT;
+			if (pOfT > 0d) {
+				this.getUpperBounds().put(t, cum + pOfT);
+				cum += pOfT;
+				this.getSortedCategories().add(t);
+			}
+		}
+
+		if (Math.abs(cum - 1d) > 1E-7) {
+			throw new IllegalArgumentException(
+					"The provided PMF does not integrate to 1: " + cum);
 		}
 
 	}
@@ -27,9 +37,15 @@ public class SimpleCategoricalProbabilityDistribution<T> implements CategoricalP
 	public T next() {
 		double nextDouble = this.getRandom().nextDouble();
 		int i = 0;
-		for (; i < this.getSortedCategories().size() && nextDouble < this.getUpperBounds().get(this.getSortedCategories().get(i)); i++) {
+		double upperBound = this.getUpperBounds().get(
+				this.getSortedCategories().get(i));
+		for (; i < this.getSortedCategories().size()
+				&& nextDouble >= upperBound; i++) {
+			upperBound = this.getUpperBounds().get(
+					this.getSortedCategories().get(i));
 		}
-		return this.getSortedCategories().get(i - 1);
+
+		return this.getSortedCategories().get(i);
 	}
 
 	public Map<T, Double> getUpperBounds() {
