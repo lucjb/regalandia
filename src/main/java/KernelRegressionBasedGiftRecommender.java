@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -8,16 +9,16 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.function.Gaussian;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 
-public class KernelRegressionBasedGiftRecommender<T> implements
-		GiftRecommender<T> {
+public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<T> {
 
 	private List<T> gifts;
 	private Map<T, GiftPoint<T>> giftSpace = Maps.newHashMap();
 	private Random random = new Random(System.currentTimeMillis());
 	private GiftRecommender<T> start;
 	private Metric<T> metric;
-	private double sigma = 1;
+	private double sigma = 1d / Math.sqrt(2 * Math.PI);
 	private UnivariateFunction kernel = new Gaussian(0d, this.getSigma());
 	private Iterable<GiftPoint<T>> points;
 
@@ -32,14 +33,14 @@ public class KernelRegressionBasedGiftRecommender<T> implements
 	}
 
 	@Override
-	public Set<GiftRecommendation<T>> recommend(
-			Set<GiftRecommendation<T>> previousRecommendations, int n) {
-
+	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
+		if (previousRecommendations.isEmpty()) {
+			return start.recommend(previousRecommendations, n);
+		}
 		populateFacts(previousRecommendations);
 		estimateUserScores(previousRecommendations);
 		estimateRecommendability();
 
-		Collection<GiftPoint<T>> values = this.getGiftSpace().values();
 
 		return start.recommend(previousRecommendations, n);
 	}
@@ -55,24 +56,23 @@ public class KernelRegressionBasedGiftRecommender<T> implements
 
 		for (GiftPoint<T> giftPoint : this.getPoints()) {
 			if (giftPoint.getCertainty() == 1d)
-				continue;
-			double w = giftPoint.getCertainty() * giftPoint.getPredictedScore();
-			giftPoint.setRecommendability(w / totalW);
+				giftPoint.setRecommendability(0d);
+			else {
+				double w = giftPoint.getCertainty() * giftPoint.getPredictedScore();
+				giftPoint.setRecommendability(w / totalW);
+			}
 		}
 	}
 
-	private void populateFacts(
-			Set<GiftRecommendation<T>> previousRecommendations) {
+	private void populateFacts(Set<GiftRecommendation<T>> previousRecommendations) {
 		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
-			GiftPoint<T> giftPoint = this.getGiftSpace().get(
-					giftRecommendation.getGift());
+			GiftPoint<T> giftPoint = this.getGiftSpace().get(giftRecommendation.getGift());
 			giftPoint.setPredictedScore(giftRecommendation.getUserScore());
 			giftPoint.setCertainty(1d);
 		}
 	}
 
-	private void estimateUserScores(
-			Set<GiftRecommendation<T>> previousRecommendations) {
+	private void estimateUserScores(Set<GiftRecommendation<T>> previousRecommendations) {
 		for (GiftPoint<T> x : this.getPoints()) {
 			if (x.getCertainty() == 1d)
 				continue;
@@ -81,28 +81,24 @@ public class KernelRegressionBasedGiftRecommender<T> implements
 
 	}
 
-	public void estimateUserScore(GiftPoint<T> x,
-			Set<GiftRecommendation<T>> previousRecommendations) {
+	public void estimateUserScore(GiftPoint<T> x, Set<GiftRecommendation<T>> previousRecommendations) {
 		double distanceWeightedUserScoreSum = 0d;
 		double distanceWeightsSum = 0d;
 		double distanceWeightedCertaintySum = 0d;
+		double count = 0;
 		for (GiftRecommendation<T> pr : previousRecommendations) {
 			GiftPoint<T> y = this.getGiftSpace().get(pr.getGift());
-			double xyDistance = this.getMetric().compute(x.getGift(),
-					y.getGift());
+			double xyDistance = this.getMetric().compute(x.getGift(), y.getGift());
 			double distanceWeight = this.getKernel().value(xyDistance);
 			distanceWeightsSum += distanceWeight;
-			double distanceWeightedUserScore = distanceWeight
-					* y.getPredictedScore();
-			double distanceWeightedCertainty = distanceWeight
-					* y.getCertainty();
+			double distanceWeightedUserScore = distanceWeight * y.getPredictedScore();
+			double distanceWeightedCertainty = distanceWeight * y.getCertainty();
 			distanceWeightedUserScoreSum += distanceWeightedUserScore;
 			distanceWeightedCertaintySum += distanceWeightedCertainty;
+			count++;
 		}
-		double avgDistanceWeightedUserScore = distanceWeightedUserScoreSum
-				/ distanceWeightsSum;
-		double avgDistanceWeightedCertainty = distanceWeightedCertaintySum
-				/ distanceWeightsSum;
+		double avgDistanceWeightedUserScore = distanceWeightedUserScoreSum / count;
+		double avgDistanceWeightedCertainty = distanceWeightedCertaintySum / count;
 		x.setPredictedScore(avgDistanceWeightedUserScore);
 		x.setCertainty(avgDistanceWeightedCertainty);
 	}
