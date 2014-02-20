@@ -1,3 +1,5 @@
+package org.cronopios.regalator;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -40,7 +42,8 @@ public class SimpleCategoricalProbabilityDistribution<T> implements
 		double upperBound = this.getUpperBounds().get(
 				this.getSortedCategories().get(i));
 		for (; i < this.getSortedCategories().size()
-				&& nextDouble >= upperBound; i++) {
+				&& nextDouble >= upperBound;) {
+			i++;
 			upperBound = this.getUpperBounds().get(
 					this.getSortedCategories().get(i));
 		}

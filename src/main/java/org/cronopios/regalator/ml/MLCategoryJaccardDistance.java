@@ -1,3 +1,7 @@
+package org.cronopios.regalator.ml;
+import org.cronopios.regalator.JaccardDistance;
+import org.cronopios.regalator.Metric;
+
 public class MLCategoryJaccardDistance implements Metric<MLCategory> {
 
 	private JaccardDistance<MLCategory> jaccardDistance = new JaccardDistance<MLCategory>();

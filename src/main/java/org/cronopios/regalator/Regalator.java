@@ -1,8 +1,13 @@
+package org.cronopios.regalator;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import org.cronopios.regalator.ml.MLCategory;
+import org.cronopios.regalator.ml.MLCategoryParser;
+import org.cronopios.regalator.ml.MLCategoryPathJaccardIndex;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

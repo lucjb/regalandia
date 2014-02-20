@@ -1,9 +1,6 @@
-import java.util.Collection;
+package org.cronopios.regalator;
+
 import java.util.Set;
-
-import org.apache.commons.collections.CollectionUtils;
-
-import sun.text.normalizer.UBiDiProps;
 
 import com.google.common.collect.Sets;
 

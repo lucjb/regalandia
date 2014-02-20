@@ -1,6 +1,9 @@
+package org.cronopios.regalator.ml;
+
 import java.util.Collection;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.cronopios.regalator.SimilarityMeasure;
 
 public class MLCategoryPathJaccardIndex implements SimilarityMeasure<MLCategory> {
 

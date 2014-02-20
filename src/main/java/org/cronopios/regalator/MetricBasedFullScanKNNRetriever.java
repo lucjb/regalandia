@@ -1,3 +1,4 @@
+package org.cronopios.regalator;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;

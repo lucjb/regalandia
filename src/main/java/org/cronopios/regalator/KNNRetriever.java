@@ -1,3 +1,4 @@
+package org.cronopios.regalator;
 import java.util.List;
 
 public interface KNNRetriever<T> {

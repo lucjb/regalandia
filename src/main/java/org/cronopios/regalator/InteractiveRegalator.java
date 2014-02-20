@@ -1,8 +1,13 @@
+package org.cronopios.regalator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Set;
+
+import org.cronopios.regalator.ml.MLCategory;
+import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
+import org.cronopios.regalator.ml.MLCategoryParser;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

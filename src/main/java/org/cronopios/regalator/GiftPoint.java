@@ -1,3 +1,4 @@
+package org.cronopios.regalator;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class GiftPoint<T> {

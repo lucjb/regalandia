@@ -1,3 +1,4 @@
+package org.cronopios.regalator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
