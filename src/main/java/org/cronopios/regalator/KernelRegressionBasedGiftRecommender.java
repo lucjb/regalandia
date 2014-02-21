@@ -13,6 +13,34 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 
+/**
+ * Each gift has a user score and a certainty (GiftPoint). The user score is a
+ * real number in [0,1]. 0 means the gift is totally wrong, 1 means the gift is
+ * perfect. The certainty is a real number in [0,1] also. All user provided
+ * scores, have certainty 1. Based on user provided scores (only these), which
+ * have certainty 1 always, this algorithm tries to predict the user score of
+ * all other gifts. For each unscored gift, its user score is predicted using
+ * the naradaya-watson kernel estimator. Its certainty, is estimated as the
+ * average of another kernel (not actually a kernel, it is just a function which
+ * evaluates to 1 at d=0, and decreases for d>0).
+ * 
+ * Once user score and certainty is estimated for all other gitfs, a probability
+ * distribution is built based on these two features. This is the probability of
+ * being suggested to the user.
+ * 
+ * 
+ * For each giftpoint g with certainty(g) < 1, its probability is:
+ * 
+ * w(g)=(1-certainty(g))*1/n + certainty(g)*score(g)
+ * 
+ * p(g)=w/sum(w)
+ * 
+ * n is the amount of gifts with certainty<1.
+ * 
+ * @author lbernardi
+ * 
+ * @param <T>
+ */
 public class KernelRegressionBasedGiftRecommender<T> implements
 		GiftRecommender<T> {
 
