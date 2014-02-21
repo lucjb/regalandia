@@ -1,4 +1,5 @@
 package org.cronopios.regalator;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,9 +32,13 @@ public class InteractiveRegalator {
 		// WeightedRandomGiftRecommender<MLCategory>(
 		// recommendableGifts, new MLCategoryPathJaccardIndex());
 
-		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
+		// KernelRegressionBasedGiftRecommender<MLCategory>
+		// kernelRegressionBasedGiftRecommender = new
+		// KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts,
+		// new MLCategoryJaccardDistance());
+		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryJaccardDistance());
 
-		GiftRecommender<MLCategory> giftRecommender = kernelRegressionBasedGiftRecommender;
+		GiftRecommender<MLCategory> giftRecommender = kernelFilteredRegressionBasedGiftRecommender;
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();

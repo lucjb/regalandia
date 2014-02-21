@@ -1,4 +1,5 @@
 package org.cronopios.regalator;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -7,10 +8,10 @@ import com.google.common.collect.Ordering;
 
 public class MetricBasedFullScanKNNRetriever<T> implements KNNRetriever<T> {
 
-	private Collection<T> space;
+	private Iterable<T> space;
 	private Metric<T> metric;
 
-	public MetricBasedFullScanKNNRetriever(Collection<T> space, Metric<T> metric) {
+	public MetricBasedFullScanKNNRetriever(Iterable<T> space, Metric<T> metric) {
 		this.setSpace(space);
 		this.setMetric(metric);
 	}
@@ -26,11 +27,11 @@ public class MetricBasedFullScanKNNRetriever<T> implements KNNRetriever<T> {
 		}).leastOf(this.getSpace(), k);
 	}
 
-	public Collection<T> getSpace() {
+	public Iterable<T> getSpace() {
 		return space;
 	}
 
-	public void setSpace(Collection<T> space) {
+	public void setSpace(Iterable<T> space) {
 		this.space = space;
 	}
 
