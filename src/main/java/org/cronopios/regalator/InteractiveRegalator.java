@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.cronopios.regalator.ml.MLCategory;
-import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
 import org.cronopios.regalator.ml.MLCategoryParser;
+import org.cronopios.regalator.ml.MLCategoryPathStringJaccardDistance;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -25,6 +25,7 @@ public class InteractiveRegalator {
 			if (mlCategory.getPath_from_root().size() > 3) {
 				recommendableGifts.add(mlCategory);
 			}
+			mlCategory.getPathString();
 		}
 
 		// WeightedRandomGiftRecommender<MLCategory>
@@ -36,7 +37,7 @@ public class InteractiveRegalator {
 		// kernelRegressionBasedGiftRecommender = new
 		// KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts,
 		// new MLCategoryJaccardDistance());
-		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryJaccardDistance());
+		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryPathStringJaccardDistance());
 
 		GiftRecommender<MLCategory> giftRecommender = kernelFilteredRegressionBasedGiftRecommender;
 

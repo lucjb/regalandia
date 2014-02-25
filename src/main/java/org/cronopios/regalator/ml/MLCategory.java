@@ -1,14 +1,13 @@
 package org.cronopios.regalator.ml;
-import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.Set;
 
 public class MLCategory {
 
 	private String id;
 	private String name;
 	private Set<MLCategory> path_from_root;
+	private String pathString;
 
 	@Override
 	public String toString() {
@@ -56,6 +55,25 @@ public class MLCategory {
 
 	public void setPath_from_root(Set<MLCategory> path_from_root) {
 		this.path_from_root = path_from_root;
+	}
+
+	public String getPathString() {
+		if (this.pathString == null) {
+			this.buildPathString();
+		}
+		return pathString;
+	}
+
+	private void buildPathString() {
+		StringBuffer pathStringBuffer = new StringBuffer();
+		for (MLCategory pathElement : this.getPath_from_root()) {
+			pathStringBuffer.append(pathElement.getName() + ">");
+		}
+		this.setPathString(pathStringBuffer.toString());
+	}
+
+	public void setPathString(String pathString) {
+		this.pathString = pathString;
 	}
 
 }

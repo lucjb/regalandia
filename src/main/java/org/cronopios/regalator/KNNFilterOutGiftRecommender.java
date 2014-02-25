@@ -25,14 +25,12 @@ public class KNNFilterOutGiftRecommender<T> extends KernelRegressionBasedGiftRec
 				List<GiftPoint<T>> retrieve = this.getKnnRetriever().retrieve(this.getGiftSpace().get(giftRecommendation.getGift()), 10);
 				GiftPoint<T> giftPoint2 = retrieve.get(9);
 				double minDistance = this.getMetric().compute(giftPoint2.getGift(), giftRecommendation.getGift());
-				System.out.println("min distance: " + minDistance);
 				for (GiftPoint<T> giftPoint : this.getPoints()) {
 					double distance = this.getMetric().compute(giftPoint.getGift(), giftRecommendation.getGift());
 					if (distance <= minDistance) {
 						giftPoint.setPredictedScore(0d);
 						giftPoint.setCertainty(1d);
 						giftPoint.setRecommendability(0d);
-						System.out.println("removed: " + giftPoint.getGift());
 					}
 				}
 			}
