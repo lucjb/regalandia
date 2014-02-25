@@ -10,7 +10,6 @@ public class MLCategory {
 	private Set<MLCategory> children_categories;
 	private int total_items_in_this_category;
 
-	
 	@Override
 	public String toString() {
 		StringBuilder ts = new StringBuilder();
@@ -75,4 +74,22 @@ public class MLCategory {
 		this.children_categories = children_categories;
 	}
 
+	public boolean isFor(String categoryPathElementSubstring) {
+		if (this.getName().contains(categoryPathElementSubstring))
+			return true;
+		if (this.getPath_from_root() != null) {
+			Set<MLCategory> path_from_root2 = this.getPath_from_root();
+			for (MLCategory mlCategory : path_from_root2) {
+				if (mlCategory != this
+						&& mlCategory.isFor(categoryPathElementSubstring)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean isRoot() {
+		return this.getPath_from_root().size() == 1;
+	}
 }

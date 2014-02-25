@@ -22,13 +22,56 @@ public class InteractiveRegalator {
 				.parseMLCategories("all");
 
 		List<MLCategory> recommendableGifts = Lists.newArrayList();
+
+		int niños = 0;
+		int niñas = 0;
+		int mujer = 0;
+		int hombre = 0;
+		int discarded = 0;
+		int leaves = 0;
+		int otros = 0;
+		int total = 0;
 		for (MLCategory mlCategory : allMlCategories) {
-			System.out.println(mlCategory + " "
-					+ mlCategory.getChildren_categories().size());
-			if (mlCategory.getPath_from_root().size() > 3) {
-				recommendableGifts.add(mlCategory);
+			if (mlCategory.isFor("Niñas")) {
+				niñas++;
 			}
+			if (mlCategory.isFor("Niños")) {
+				niños++;
+			}
+			if (mlCategory.isFor("Hombre")) {
+				hombre++;
+			}
+			if (mlCategory.isFor("Mujer")) {
+				mujer++;
+			}
+			if (mlCategory.isFor("Otros")) {
+				otros++;
+			}
+			if (mlCategory.isFor("Otras")) {
+				otros++;
+			}
+			if (mlCategory.getTotal_items_in_this_category() > 0
+					&& mlCategory.getChildren_categories().isEmpty()) {
+				recommendableGifts.add(mlCategory);
+			} else {
+				discarded++;
+			}
+
+			if (mlCategory.getChildren_categories().isEmpty()) {
+				leaves++;
+			}
+			total++;
+
 		}
+		System.out.println("Niñas " + niñas);
+		System.out.println("Niños " + niños);
+		System.out.println("Mujer " + mujer);
+		System.out.println("Hombre " + hombre);
+		System.out.println("Otros " + otros);
+		System.out.println("Leaves " + leaves);
+		System.out.println("Discarded " + discarded);
+		System.out.println("Candidates " + recommendableGifts.size());
+		System.out.println("Total " + total);
 
 		// WeightedRandomGiftRecommender<MLCategory>
 		// weightedRandomGiftRecommender = new
@@ -70,4 +113,5 @@ public class InteractiveRegalator {
 			recommendations = giftRecommender.recommend(input, n);
 		}
 	}
+
 }
