@@ -92,4 +92,8 @@ public class MLCategory {
 	public boolean isRoot() {
 		return this.getPath_from_root().size() == 1;
 	}
+
+	public boolean isLeaf() {
+		return this.getChildren_categories().isEmpty();
+	}
 }

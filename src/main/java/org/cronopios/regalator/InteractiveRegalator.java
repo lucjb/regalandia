@@ -51,7 +51,8 @@ public class InteractiveRegalator {
 				otros++;
 			}
 			if (mlCategory.getTotal_items_in_this_category() > 0
-					&& mlCategory.getChildren_categories().isEmpty()) {
+					&& mlCategory.isLeaf() && !mlCategory.isFor("Otros")
+					&& !mlCategory.isFor("Otras")) {
 				recommendableGifts.add(mlCategory);
 			} else {
 				discarded++;
@@ -78,14 +79,12 @@ public class InteractiveRegalator {
 		// WeightedRandomGiftRecommender<MLCategory>(
 		// recommendableGifts, new MLCategoryPathJaccardIndex());
 
-		// KernelRegressionBasedGiftRecommender<MLCategory>
-		// kernelRegressionBasedGiftRecommender = new
-		// KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts,
-		// new MLCategoryJaccardDistance());
+		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(
+				recommendableGifts, new MLCategoryJaccardDistance());
 		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(
 				recommendableGifts, new MLCategoryJaccardDistance());
 
-		GiftRecommender<MLCategory> giftRecommender = kernelFilteredRegressionBasedGiftRecommender;
+		GiftRecommender<MLCategory> giftRecommender = kernelRegressionBasedGiftRecommender;
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
