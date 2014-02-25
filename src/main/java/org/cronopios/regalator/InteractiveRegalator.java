@@ -18,10 +18,13 @@ public class InteractiveRegalator {
 	public static void main(String[] args) throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
 
-		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
+		List<MLCategory> allMlCategories = mlCategoryParser
+				.parseMLCategories("all");
 
 		List<MLCategory> recommendableGifts = Lists.newArrayList();
 		for (MLCategory mlCategory : allMlCategories) {
+			System.out.println(mlCategory + " "
+					+ mlCategory.getChildren_categories().size());
 			if (mlCategory.getPath_from_root().size() > 3) {
 				recommendableGifts.add(mlCategory);
 			}
@@ -36,13 +39,15 @@ public class InteractiveRegalator {
 		// kernelRegressionBasedGiftRecommender = new
 		// KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts,
 		// new MLCategoryJaccardDistance());
-		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryJaccardDistance());
+		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(
+				recommendableGifts, new MLCategoryJaccardDistance());
 
 		GiftRecommender<MLCategory> giftRecommender = kernelFilteredRegressionBasedGiftRecommender;
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
-		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender.recommend(input, n);
+		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender
+				.recommend(input, n);
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 

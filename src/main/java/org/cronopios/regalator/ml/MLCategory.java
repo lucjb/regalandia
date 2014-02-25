@@ -1,15 +1,16 @@
 package org.cronopios.regalator.ml;
-import java.util.List;
-import java.util.Set;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.Set;
 
 public class MLCategory {
 
 	private String id;
 	private String name;
 	private Set<MLCategory> path_from_root;
+	private Set<MLCategory> children_categories;
+	private int total_items_in_this_category;
 
+	
 	@Override
 	public String toString() {
 		StringBuilder ts = new StringBuilder();
@@ -56,6 +57,22 @@ public class MLCategory {
 
 	public void setPath_from_root(Set<MLCategory> path_from_root) {
 		this.path_from_root = path_from_root;
+	}
+
+	public int getTotal_items_in_this_category() {
+		return total_items_in_this_category;
+	}
+
+	public void setTotal_items_in_this_category(int total_items_in_this_category) {
+		this.total_items_in_this_category = total_items_in_this_category;
+	}
+
+	public Set<MLCategory> getChildren_categories() {
+		return children_categories;
+	}
+
+	public void setChildren_categories(Set<MLCategory> children_categories) {
+		this.children_categories = children_categories;
 	}
 
 }

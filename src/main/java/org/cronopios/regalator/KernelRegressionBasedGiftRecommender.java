@@ -55,7 +55,7 @@ public class KernelRegressionBasedGiftRecommender<T> implements
 
 		@Override
 		public double value(double x) {
-			return Math.exp(-x);
+			return (1 - x) * (Math.exp(-x));
 		}
 	};
 	private Iterable<GiftPoint<T>> points;
