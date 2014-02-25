@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.cronopios.regalator.ml.MLCategory;
+import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
 import org.cronopios.regalator.ml.MLCategoryParser;
-import org.cronopios.regalator.ml.MLCategoryPathStringJaccardDistance;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -21,25 +21,65 @@ public class InteractiveRegalator {
 		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
 
 		List<MLCategory> recommendableGifts = Lists.newArrayList();
+
+		int niños = 0;
+		int niñas = 0;
+		int mujer = 0;
+		int hombre = 0;
+		int discarded = 0;
+		int leaves = 0;
+		int otros = 0;
+		int total = 0;
 		for (MLCategory mlCategory : allMlCategories) {
-			if (mlCategory.getPath_from_root().size() > 3) {
-				recommendableGifts.add(mlCategory);
+			if (mlCategory.isFor("NiÃ±as")) {
+				niñas++;
 			}
-			mlCategory.getPathString();
+			if (mlCategory.isFor("NiÃ±os")) {
+				niños++;
+			}
+			if (mlCategory.isFor("Hombre")) {
+				hombre++;
+			}
+			if (mlCategory.isFor("Mujer")) {
+				mujer++;
+			}
+			if (mlCategory.isFor("Otros")) {
+				otros++;
+			}
+			if (mlCategory.isFor("Otras")) {
+				otros++;
+			}
+			if (mlCategory.getTotal_items_in_this_category() > 0 && mlCategory.isLeaf() && !mlCategory.isFor("Otros") && !mlCategory.isFor("Otras")) {
+				recommendableGifts.add(mlCategory);
+			} else {
+				discarded++;
+			}
+
+			if (mlCategory.getChildren_categories().isEmpty()) {
+				leaves++;
+			}
+			total++;
+
 		}
+		System.out.println("NiÃ±as " + niñas);
+		System.out.println("NiÃ±os " + niños);
+		System.out.println("Mujer " + mujer);
+		System.out.println("Hombre " + hombre);
+		System.out.println("Otros " + otros);
+		System.out.println("Leaves " + leaves);
+		System.out.println("Discarded " + discarded);
+		System.out.println("Candidates " + recommendableGifts.size());
+		System.out.println("Total " + total);
 
 		// WeightedRandomGiftRecommender<MLCategory>
 		// weightedRandomGiftRecommender = new
 		// WeightedRandomGiftRecommender<MLCategory>(
 		// recommendableGifts, new MLCategoryPathJaccardIndex());
 
-		// KernelRegressionBasedGiftRecommender<MLCategory>
-		// kernelRegressionBasedGiftRecommender = new
-		// KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts,
-		// new MLCategoryJaccardDistance());
-		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryPathStringJaccardDistance());
+		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
+		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryJaccardDistance());
 
-		GiftRecommender<MLCategory> giftRecommender = kernelFilteredRegressionBasedGiftRecommender;
+		GiftRecommender<MLCategory> giftRecommender = kernelRegressionBasedGiftRecommender;
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
