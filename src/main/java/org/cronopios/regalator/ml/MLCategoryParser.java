@@ -25,40 +25,47 @@ public class MLCategoryParser {
 
 	public static void main(String[] args) throws IOException {
 		VocabularyParser vocabularyParser = new VocabularyParser();
-		Set<String> vocabulary = vocabularyParser
-				.parseVocabulary("vocabulary.txt");
+		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulary.txt");
 
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
 
-		List<MLCategory> allMlCategories = mlCategoryParser
-				.parseMLCategories("all");
+		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
 
 		// exportCategories(allMlCategories);
 
+		int discarded = 0;
 		for (MLCategory mlCategory : allMlCategories) {
 			if (mlCategory.isLeaf()) {
-				String name = mlCategory.getName();
-				String lowerCase = name.toLowerCase();
-				String[] split = lowerCase.split(" ");
-				boolean isBrand = false;
-				for (String string : split) {
-					if (!vocabulary.contains(lowerCase)) {
-						System.out.println(mlCategory);
-					}
+				boolean isBrand = isBrand(vocabulary, mlCategory);
+				if (isBrand) {
+					discarded++;
+					System.out.println(mlCategory);
 				}
 			}
 		}
+		System.out.println(discarded);
 
 	}
 
-	private static void exportCategories(List<MLCategory> allMlCategories)
-			throws IOException {
+	private static boolean isBrand(Set<String> vocabulary, MLCategory mlCategory) {
+		String name = mlCategory.getName();
+		String lowerCase = name.toLowerCase();
+		String[] split = lowerCase.split(" ");
+		boolean isBrand = false;
+		for (String string : split) {
+			boolean inVocabulary = vocabulary.contains(string);
+			if (!inVocabulary) {
+				isBrand = true;
+			}
+		}
+		return isBrand;
+	}
+
+	private static void exportCategories(List<MLCategory> allMlCategories) throws IOException {
 		Writer fileWriter = new FileWriter(new File("mlcattree.txt"));
 		for (MLCategory mlCategory : allMlCategories) {
 			if (mlCategory.isRoot()) {
-				System.out.println(mlCategory + " "
-						+ mlCategory.getChildren_categories().size() + " "
-						+ mlCategory.getTotal_items_in_this_category());
+				System.out.println(mlCategory + " " + mlCategory.getChildren_categories().size() + " " + mlCategory.getTotal_items_in_this_category());
 				print(mlCategory, fileWriter);
 			}
 		}
@@ -66,20 +73,17 @@ public class MLCategoryParser {
 		fileWriter.close();
 	}
 
-	private static void print(MLCategory mlCategory, Writer writer)
-			throws IOException {
+	private static void print(MLCategory mlCategory, Writer writer) throws IOException {
 		String string = mlCategory.toString();
 		writer.write(string + "\n");
-		Set<MLCategory> children_categories = mlCategory
-				.getChildren_categories();
+		Set<MLCategory> children_categories = mlCategory.getChildren_categories();
 		for (MLCategory child : children_categories) {
 			print(child, writer);
 		}
 
 	}
 
-	public List<MLCategory> parseMLCategories(String fileName)
-			throws FileNotFoundException {
+	public List<MLCategory> parseMLCategories(String fileName) throws FileNotFoundException {
 		List<MLCategory> allMlCategories = Lists.newLinkedList();
 		FileReader fileRader = new FileReader(new File(fileName));
 		JsonParser parser = new JsonParser();
@@ -98,8 +102,7 @@ public class MLCategoryParser {
 		}
 
 		for (MLCategory mlCategory : allMlCategories) {
-			Set<MLCategory> children_categories = mlCategory
-					.getChildren_categories();
+			Set<MLCategory> children_categories = mlCategory.getChildren_categories();
 			Set<MLCategory> childrenWithChildren = Sets.newLinkedHashSet();
 			for (MLCategory child : children_categories) {
 				MLCategory childWithChildren = idCat.get(child.getId());

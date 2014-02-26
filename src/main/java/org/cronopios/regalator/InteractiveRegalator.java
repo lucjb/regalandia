@@ -9,6 +9,8 @@ import java.util.Set;
 import org.cronopios.regalator.ml.MLCategory;
 import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
 import org.cronopios.regalator.ml.MLCategoryParser;
+import org.cronopios.regalator.ml.brands.BrandFilter;
+import org.cronopios.regalator.ml.brands.VocabularyParser;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -17,8 +19,12 @@ public class InteractiveRegalator {
 
 	public static void main(String[] args) throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-
 		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
+
+		VocabularyParser vocabularyParser = new VocabularyParser();
+		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulary.txt");
+		BrandFilter brandFilter = new BrandFilter(vocabulary);
+		brandFilter.filterBrands(allMlCategories);
 
 		List<MLCategory> recommendableGifts = Lists.newArrayList();
 
@@ -30,11 +36,12 @@ public class InteractiveRegalator {
 		int leaves = 0;
 		int otros = 0;
 		int total = 0;
+		int brands;
 		for (MLCategory mlCategory : allMlCategories) {
-			if (mlCategory.isFor("NiÃ±as")) {
+			if (mlCategory.isFor("Niñas")) {
 				niñas++;
 			}
-			if (mlCategory.isFor("NiÃ±os")) {
+			if (mlCategory.isFor("Niños")) {
 				niños++;
 			}
 			if (mlCategory.isFor("Hombre")) {
