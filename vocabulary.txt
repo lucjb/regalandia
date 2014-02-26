@@ -20,8 +20,6 @@ australia
 bahamas
 bahia
 baja
-bay
-beach
 birmania
 bolivar
 bolivia
@@ -33,7 +31,6 @@ cabo
 california
 camerun
 canada
-cape
 caribe
 carolina
 catarina
@@ -42,15 +39,12 @@ central
 centroafricana
 chile
 china
-city
 colombia
 colorado
-columbia
 congo
 cordoba
 corea
 costa
-creek
 cruz
 da
 dakota
@@ -58,7 +52,6 @@ de
 del
 do
 domingo
-downs
 ecuador
 egipto
 el
@@ -67,13 +60,11 @@ espirito
 estados
 etiopia
 europa
-falls
 faso
 filipinas
 finlandia
 fiyi
 florida
-fort
 francesa
 francia
 gabon
@@ -83,7 +74,6 @@ goias
 grande
 grecia
 groenlandia
-grosso
 guatemala
 guinea
 guyana
@@ -97,7 +87,6 @@ indonesia
 inglaterra
 iowa
 iran
-island
 islandia
 islas
 italia
@@ -105,10 +94,8 @@ janeiro
 japon
 jersey
 kansas
-ken
 kenia
 la
-lake
 laos
 las
 los
@@ -137,7 +124,6 @@ nevada
 new
 nigeria
 norte
-north
 noruega
 nueva
 oceania
@@ -155,7 +141,6 @@ paulo
 pensilvania
 pernambuco
 peru
-point
 polinesia
 popular
 port
@@ -174,10 +159,8 @@ san
 santa
 santiago
 santo
-sao
 saudita
 somalia
-south
 springs
 st
 sudafrica
@@ -185,7 +168,6 @@ sudan
 sudeste
 suecia
 suiza
-sul
 sur
 tailandia
 taiwan
@@ -205,7 +187,6 @@ victoria
 vietnam
 virginia
 washington
-west
 wisconsin
 wyoming
 y
@@ -214,12 +195,6 @@ york
 zaire
 zelanda
 a
-aa
-aaa
-aaaa
-aarhus
-aaron
-ab
 abad
 abadia
 abadia westminster
@@ -247,7 +222,6 @@ abandone
 abandono
 abanico
 abanicos
-abans
 abaratar costos
 abarca
 abarcaba
@@ -273,20 +247,13 @@ abastecimiento agua
 abastecimos
 abasto
 abastos
-abbey
-abbiamo
-abc
 abdul
 abeja
 abejas
 abel
-abercrombie
-aberdeen
-aberto
 abertura
 aberturas
 abetos
-abia
 abierta
 abiertamente
 abiertas
@@ -295,7 +262,6 @@ abiertos
 abismal
 abismo
 abismos
-able
 abluciones
 abogado
 abogados
@@ -322,14 +288,11 @@ aborde
 abordo
 aborigen
 aborigenes
-about
 abovedada
 abovedado
 abovedados
 abra
-abraao
 abrace
-abraham
 abran
 abrasador
 abraza
@@ -409,8 +372,6 @@ absurdamente
 absurdas
 absurdo
 absurdos
-abu
-abu simbel
 abuela
 abuelas
 abuelita
@@ -449,7 +410,6 @@ abusivo
 abusivos
 abuso
 abusos
-ac
 aca
 acaba
 acababa
@@ -958,7 +918,6 @@ adicta
 adictivo
 adicto
 adictos
-adidas
 adinerada
 adineradas
 adinerados
@@ -3291,7 +3250,6 @@ armamento
 armamos
 arman
 armando
-armani
 armar
 armario
 armarios
@@ -10604,7 +10562,6 @@ convoca
 convocatoria
 convoco
 convoy
-cook
 cool
 coop
 cooperacion
@@ -11783,7 +11740,6 @@ dañando
 dañar
 daño
 daños
-dc
 dde
 deambulamos
 deambulan
@@ -13300,7 +13256,6 @@ dieran
 dieron
 dies
 diese
-diesel
 diestra
 dieta
 dietas
@@ -13860,7 +13815,6 @@ dol
 dolar
 dolares
 dolares persona
-dolce
 dolencias
 doler
 dolia
@@ -18237,7 +18191,6 @@ gano
 ganso
 gansos
 gante
-gap
 garage
 garaje
 garantia
@@ -22063,12 +22016,6 @@ johan
 johana
 johanesburgo
 johannesburgo
-john
-john lennon
-johnny
-johnson
-johny
-joinville
 jojo
 jojojo
 jolgorio
@@ -22499,7 +22446,6 @@ laburo
 lac
 lacandones
 lacar
-lacoste
 lactal
 lactea
 lacteos
@@ -28151,8 +28097,6 @@ ovni
 ovnis
 own
 oxapampa
-oxford
-oxford street
 oxidadas
 oxidado
 oxidados
@@ -34259,7 +34203,6 @@ richmond
 richter
 rickshaw
 rickshaws
-ricky
 rico
 ricoleta
 ricos
@@ -36581,7 +36524,6 @@ sofocante
 soga
 sogamoso
 sogas
-soho
 soi
 soja
 sol
@@ -36947,82 +36889,9 @@ sri
 sri lanka
 srinagar
 srta
-ss
-sspn
-st james
-st patrick
-st paul
 sta
 staba
-stadium
-staff
-stage
-stalin
-stand
 standard
-standing
-stands
-stanley
-stanley park
-stansted
-star
-starbucks
-stare
-stari
-stars
-state
-staten island
-states
-station
-status
-stavanger
-stay
-stazione
-ste
-steak
-stefan
-stefano
-stella
-stephen
-steve
-steven
-stgo
-still
-stirling
-sto
-stock
-stone
-stonehenge
-stones
-stop
-stops
-store
-stores
-storni
-story
-str
-strada
-strasse
-stratford
-stratosphere
-strauss
-strawberry
-street
-streets
-stress
-strip
-stroget
-strong
-studio
-studios
-stupa
-stupas
-stuttgart
-style
-style margin
-sua
-suarez
-suas
 suave
 suavemente
 suaves
@@ -41584,7 +41453,6 @@ zapote
 zapoteca
 zapotecas
 zar
-zara
 zaragoza
 zarate
 zarautz

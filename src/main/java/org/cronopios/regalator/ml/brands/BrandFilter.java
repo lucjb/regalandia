@@ -8,10 +8,12 @@ import java.util.Set;
 import org.cronopios.regalator.ml.MLCategory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 public class BrandFilter {
 
 	private Set<String> vocabulary;
+	private Set<String> brands = Sets.newHashSet();
 
 	public BrandFilter(Set<String> vocabulary) {
 		this.setVocabulary(vocabulary);
@@ -31,13 +33,42 @@ public class BrandFilter {
 					}
 				}
 				if (amountOfSuspectedBrands > amountOfChildren * 1d / 2d) {
+					for (MLCategory child : children) {
+						this.getBrands().add(child.getName());
+					}
 					removed.addAll(children);
 					children.clear();
 				}
 			}
 		}
 
+		for (Iterator<MLCategory> iterator = categories.iterator(); iterator.hasNext();) {
+			MLCategory mlCategory = iterator.next();
+			Set<MLCategory> children = mlCategory.getChildren_categories();
+			if (!children.isEmpty() && children.iterator().next().isLeaf()) {
+				int amountOfChildren = children.size();
+				int amountOfSuspectedBrands = 0;
+				for (MLCategory child : children) {
+					if (registeredAsBrand(child)) {
+						amountOfSuspectedBrands++;
+					}
+				}
+				if (amountOfSuspectedBrands > amountOfChildren * 1d / 2d) {
+					removed.addAll(children);
+					children.clear();
+				}
+			}
+		}
+
+		for (MLCategory mlCategory : removed) {
+			System.out.println(mlCategory);
+		}
 		categories.removeAll(removed);
+
+	}
+
+	private boolean registeredAsBrand(MLCategory child) {
+		return this.getBrands().contains(child.getName());
 	}
 
 	public boolean suspectedBrand(MLCategory mlCategory) {
@@ -76,6 +107,14 @@ public class BrandFilter {
 
 	public void setVocabulary(Set<String> vocabulary) {
 		this.vocabulary = vocabulary;
+	}
+
+	public Set<String> getBrands() {
+		return brands;
+	}
+
+	public void setBrands(Set<String> brands) {
+		this.brands = brands;
 	}
 
 }

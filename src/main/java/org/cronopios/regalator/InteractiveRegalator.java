@@ -56,7 +56,7 @@ public class InteractiveRegalator {
 			if (mlCategory.isFor("Otras")) {
 				otros++;
 			}
-			if (mlCategory.getTotal_items_in_this_category() > 0 && mlCategory.isLeaf() && !mlCategory.isFor("Otros") && !mlCategory.isFor("Otras")) {
+			if (mlCategory.isLeaf() && !mlCategory.isFor("Otros") && !mlCategory.isFor("Otras")) {
 				recommendableGifts.add(mlCategory);
 			} else {
 				discarded++;
