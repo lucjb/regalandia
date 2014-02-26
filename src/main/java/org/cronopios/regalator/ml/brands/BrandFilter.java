@@ -1,5 +1,6 @@
 package org.cronopios.regalator.ml.brands;
 
+import java.text.Normalizer;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class BrandFilter {
 						amountOfSuspectedBrands++;
 					}
 				}
-				if (amountOfSuspectedBrands > amountOfChildren * 2d / 3d) {
+				if (amountOfSuspectedBrands > amountOfChildren * 1d / 2d) {
 					removed.addAll(children);
 					children.clear();
 				}
@@ -37,24 +38,36 @@ public class BrandFilter {
 		}
 
 		categories.removeAll(removed);
-		for (MLCategory mlCategory : removed) {
-			System.out.println(mlCategory);
-		}
 	}
 
 	public boolean suspectedBrand(MLCategory mlCategory) {
 		String name = mlCategory.getName();
-		String lowerCase = name.toLowerCase();
+		String lowerCase = normalized(name);
 		String[] split = lowerCase.split(" ");
 		boolean isBrand = false;
 		for (String string : split) {
 			boolean inVocabulary = this.getVocabulary().contains(string);
 			if (!inVocabulary) {
 				isBrand = true;
-				System.out.println(string);
 			}
 		}
 		return isBrand;
+	}
+
+	private String normalized(String name) {
+		String lowerCase = name.toLowerCase();
+		String flattenToAscii = flattenToAscii(lowerCase);
+		return flattenToAscii;
+	}
+
+	public static String flattenToAscii(String string) {
+		StringBuilder sb = new StringBuilder(string.length());
+		string = Normalizer.normalize(string, Normalizer.Form.NFD);
+		for (char c : string.toCharArray()) {
+			if (c <= '\u007F')
+				sb.append(c);
+		}
+		return sb.toString();
 	}
 
 	public Set<String> getVocabulary() {
