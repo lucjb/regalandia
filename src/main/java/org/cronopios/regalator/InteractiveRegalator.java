@@ -21,8 +21,12 @@ public class InteractiveRegalator {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
 		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
 
+		new OtrosFilter().filter(allMlCategories);
+
 		VocabularyParser vocabularyParser = new VocabularyParser();
-		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulary.txt");
+		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulariorae.txt");
+		// Set<String> vocabulary =
+		// vocabularyParser.parseVocabulary("vocabulary.txt");
 		BrandFilter brandFilter = new BrandFilter(vocabulary);
 		brandFilter.filterBrands(allMlCategories);
 

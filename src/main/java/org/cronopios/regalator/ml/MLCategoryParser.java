@@ -58,7 +58,7 @@ public class MLCategoryParser {
 				isBrand = true;
 			}
 		}
-		return isBrand;
+		return isBrand;	
 	}
 
 	private static void exportCategories(List<MLCategory> allMlCategories) throws IOException {

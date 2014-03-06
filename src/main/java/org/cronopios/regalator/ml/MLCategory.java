@@ -95,7 +95,7 @@ public class MLCategory {
 	}
 
 	public boolean isFor(String categoryPathElementSubstring) {
-		if (this.getName().contains(categoryPathElementSubstring))
+		if (this.getName().equals(categoryPathElementSubstring))
 			return true;
 		if (this.getPath_from_root() != null) {
 			Set<MLCategory> path_from_root2 = this.getPath_from_root();

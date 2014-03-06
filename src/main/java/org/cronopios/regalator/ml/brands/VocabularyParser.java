@@ -13,15 +13,13 @@ public class VocabularyParser {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		VocabularyParser vocabularyParser = new VocabularyParser();
-		Set<String> vocabulary = vocabularyParser
-				.parseVocabulary("vocabulary.txt");
+		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulariorae.txt");
 		for (String word : vocabulary) {
 			System.out.println(word);
 		}
 	}
 
-	public Set<String> parseVocabulary(String fileName)
-			throws FileNotFoundException {
+	public Set<String> parseVocabulary(String fileName) throws FileNotFoundException {
 		File file = new File(fileName);
 		Set<String> vocabulary = Sets.newLinkedHashSet();
 		BufferedReader reader = new BufferedReader(new FileReader(file));
