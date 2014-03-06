@@ -16,63 +16,45 @@ public class BrandFilter {
 
 	private Vocabulary vocabulary;
 	private Set<String> brands = Sets.newHashSet();
+	private Set<String> suspiciousStrings = Sets.newHashSet();
 
 	public BrandFilter(Set<String> vocabulary) {
 		this.setVocabulary(new DefaultVocabulary(vocabulary));
 	}
 
 	public void filterBrands(List<MLCategory> categories) {
-		List<MLCategory> removed = this.doFilter(categories);
-		for (MLCategory mlCategory : removed) {
-			System.out.println(mlCategory);
-		}
-		System.out.println(removed.size());
-
-	}
-
-	private List<MLCategory> doFilter(List<MLCategory> categories) {
 		List<MLCategory> removed = Lists.newArrayList();
-		for (Iterator<MLCategory> iterator = categories.iterator(); iterator.hasNext();) {
+		for (MLCategory mlCategory : categories) {
+			Set<MLCategory> children = mlCategory.getChildren_categories();
+			if (!mlCategory.isLeaf()) {
+				if (levelSuspectedToBeBrands(children)) {
+					brandLevelFound(removed, children);
+				}
+			}
+		}
+
+		for (Iterator<MLCategory> iterator = categories.iterator(); iterator
+				.hasNext();) {
 			MLCategory mlCategory = iterator.next();
 			Set<MLCategory> children = mlCategory.getChildren_categories();
 			if (!mlCategory.isLeaf()) {
-				if (otrasMarcasAmongChildren(children)) {
-					registerBrandStrings(children);
+				int amountOfSuspectedBrands = 0;
+				for (MLCategory child : children) {
+					if (registeredAsBrand(child)) {
+						amountOfSuspectedBrands++;
+					}
+				}
+				if (amountOfSuspectedBrands > 2d) {
+					brandLevelFound(removed, children);
 				}
 			}
 		}
-
-		for (MLCategory mlCategory : categories) {
-			for (String brandString : this.getBrands()) {
-				if (mlCategory.isFor(brandString)) {
-					removed.add(mlCategory);
-				}
-			}
-
-		}
-
-		// for (Iterator<MLCategory> iterator = categories.iterator();
-		// iterator.hasNext();) {
-		// MLCategory mlCategory = iterator.next();
-		// Set<MLCategory> children = mlCategory.getChildren_categories();
-		// if (!mlCategory.isLeaf()) {
-		// int amountOfSuspectedBrands = 0;
-		// for (MLCategory child : children) {
-		// if (registeredAsBrand(child)) {
-		// amountOfSuspectedBrands++;
-		// }
-		// }
-		// if (amountOfSuspectedBrands > 2d) {
-		// brandLevelFound(removed, children);
-		// }
-		// }
-		// }
 
 		categories.removeAll(removed);
-		return removed;
 	}
 
-	private void brandLevelFound(List<MLCategory> removed, Set<MLCategory> children) {
+	private void brandLevelFound(List<MLCategory> removed,
+			Set<MLCategory> children) {
 		registerBrandStrings(children);
 		removed.addAll(children);
 		children.clear();
@@ -94,20 +76,9 @@ public class BrandFilter {
 		return amountOfSuspectedBrands > 2;
 	}
 
-	private boolean otrasMarcasAmongChildren(Set<MLCategory> children) {
-		for (MLCategory child : children) {
-			if (child.getName().equals("Otras Marcas")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private boolean registeredAsBrand(MLCategory child) {
 		return this.getBrands().contains(child.getName());
 	}
-
-	Set<String> suspects = Sets.newHashSet();
 
 	public boolean suspectedBrand(MLCategory mlCategory) {
 		String name = mlCategory.getName();
@@ -117,7 +88,7 @@ public class BrandFilter {
 			String trim = string.trim();
 			boolean inVocabulary = this.getVocabulary().contains(trim);
 			if (!inVocabulary) {
-				suspects.add(trim);
+				this.getSuspiciousStrings().add(trim);
 				return true;
 			}
 		}
@@ -153,6 +124,14 @@ public class BrandFilter {
 
 	public void setVocabulary(Vocabulary vocabulary) {
 		this.vocabulary = vocabulary;
+	}
+
+	public Set<String> getSuspiciousStrings() {
+		return suspiciousStrings;
+	}
+
+	public void setSuspiciousStrings(Set<String> suspiciousStrings) {
+		this.suspiciousStrings = suspiciousStrings;
 	}
 
 }

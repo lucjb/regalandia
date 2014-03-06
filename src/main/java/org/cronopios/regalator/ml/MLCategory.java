@@ -1,14 +1,17 @@
 package org.cronopios.regalator.ml;
 
+import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 public class MLCategory {
 
 	private String id;
 	private String name;
-	private Set<MLCategory> path_from_root;
+	private List<MLCategory> path_from_root;
 	private String pathString;
-	private Set<MLCategory> children_categories;
+	private Set<MLCategory> children_categories = Sets.newLinkedHashSet();
 	private int total_items_in_this_category;
 
 	@Override
@@ -51,11 +54,11 @@ public class MLCategory {
 		this.name = name;
 	}
 
-	public Set<MLCategory> getPath_from_root() {
+	public List<MLCategory> getPath_from_root() {
 		return path_from_root;
 	}
 
-	public void setPath_from_root(Set<MLCategory> path_from_root) {
+	public void setPath_from_root(List<MLCategory> path_from_root) {
 		this.path_from_root = path_from_root;
 	}
 
@@ -98,9 +101,10 @@ public class MLCategory {
 		if (this.getName().equals(categoryPathElementSubstring))
 			return true;
 		if (this.getPath_from_root() != null) {
-			Set<MLCategory> path_from_root2 = this.getPath_from_root();
+			List<MLCategory> path_from_root2 = this.getPath_from_root();
 			for (MLCategory mlCategory : path_from_root2) {
-				if (mlCategory != this && mlCategory.isFor(categoryPathElementSubstring)) {
+				if (mlCategory != this
+						&& mlCategory.isFor(categoryPathElementSubstring)) {
 					return true;
 				}
 			}
@@ -114,5 +118,12 @@ public class MLCategory {
 
 	public boolean isLeaf() {
 		return this.getChildren_categories().isEmpty();
+	}
+
+	public MLCategory getParent() {
+		if (this.getPath_from_root().isEmpty())
+			return null;
+		return this.getPath_from_root()
+				.get(this.getPath_from_root().size() - 1);
 	}
 }

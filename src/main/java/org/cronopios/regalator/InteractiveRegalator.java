@@ -10,6 +10,7 @@ import org.cronopios.regalator.ml.MLCategory;
 import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
 import org.cronopios.regalator.ml.MLCategoryParser;
 import org.cronopios.regalator.ml.brands.BrandFilter;
+import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 import org.cronopios.regalator.ml.brands.VocabularyParser;
 
 import com.google.common.collect.Lists;
@@ -19,21 +20,25 @@ public class InteractiveRegalator {
 
 	public static void main(String[] args) throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
+		List<MLCategory> allMlCategories = mlCategoryParser
+				.parseMLCategories("all");
 
 		new OtrosFilter().filter(allMlCategories);
 
-		VocabularyParser vocabularyParser = new VocabularyParser();
-		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulariorae.txt");
+		// VocabularyParser vocabularyParser = new VocabularyParser();
+		// Set<String> vocabulary = vocabularyParser
+		// .parseVocabulary("vocabulariorae.txt");
 		// Set<String> vocabulary =
 		// vocabularyParser.parseVocabulary("vocabulary.txt");
-		BrandFilter brandFilter = new BrandFilter(vocabulary);
-		brandFilter.filterBrands(allMlCategories);
+		// BrandFilter brandFilter = new BrandFilter(vocabulary);
+		// brandFilter.filterBrands(allMlCategories);
+
+		new FlagBasedBrandFilter().filterBrands(allMlCategories);
 
 		List<MLCategory> recommendableGifts = Lists.newArrayList();
 
-		int niños = 0;
-		int niñas = 0;
+		int ninos = 0;
+		int ninas = 0;
 		int mujer = 0;
 		int hombre = 0;
 		int discarded = 0;
@@ -42,11 +47,11 @@ public class InteractiveRegalator {
 		int total = 0;
 		int brands;
 		for (MLCategory mlCategory : allMlCategories) {
-			if (mlCategory.isFor("Niñas")) {
-				niñas++;
+			if (mlCategory.isFor("Ninas")) {
+				ninas++;
 			}
-			if (mlCategory.isFor("Niños")) {
-				niños++;
+			if (mlCategory.isFor("Ninos")) {
+				ninos++;
 			}
 			if (mlCategory.isFor("Hombre")) {
 				hombre++;
@@ -60,7 +65,7 @@ public class InteractiveRegalator {
 			if (mlCategory.isFor("Otras")) {
 				otros++;
 			}
-			if (mlCategory.isLeaf() && !mlCategory.isFor("Otros") && !mlCategory.isFor("Otras")) {
+			if (mlCategory.isLeaf()) {
 				recommendableGifts.add(mlCategory);
 			} else {
 				discarded++;
@@ -72,8 +77,8 @@ public class InteractiveRegalator {
 			total++;
 
 		}
-		System.out.println("NiÃ±as " + niñas);
-		System.out.println("NiÃ±os " + niños);
+		System.out.println("NiÃ±as " + ninas);
+		System.out.println("NiÃ±os " + ninos);
 		System.out.println("Mujer " + mujer);
 		System.out.println("Hombre " + hombre);
 		System.out.println("Otros " + otros);
@@ -87,14 +92,17 @@ public class InteractiveRegalator {
 		// WeightedRandomGiftRecommender<MLCategory>(
 		// recommendableGifts, new MLCategoryPathJaccardIndex());
 
-		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(recommendableGifts, new MLCategoryJaccardDistance());
-		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(recommendableGifts, new MLCategoryJaccardDistance());
+		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(
+				recommendableGifts, new MLCategoryJaccardDistance());
+		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(
+				recommendableGifts, new MLCategoryJaccardDistance());
 
 		GiftRecommender<MLCategory> giftRecommender = kernelRegressionBasedGiftRecommender;
 
 		int n = 3;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
-		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender.recommend(input, n);
+		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender
+				.recommend(input, n);
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
