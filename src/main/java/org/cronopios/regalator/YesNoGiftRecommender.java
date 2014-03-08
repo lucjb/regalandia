@@ -94,7 +94,7 @@ public class YesNoGiftRecommender<T> implements GiftRecommender<T> {
 		for (GiftRecommendation<T> neighbour : neighbours) {
 			if (neighbour.getUserScore() == null) {
 				dontKnowCount++;
-			} else if (neighbour.getUserScore().equals(1d)) {
+			} else if (neighbour.getUserScore() > 0.5) {
 				yesCount++;
 			}
 			total++;
