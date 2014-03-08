@@ -92,14 +92,17 @@ public class InteractiveRegalator {
 		// WeightedRandomGiftRecommender<MLCategory>(
 		// recommendableGifts, new MLCategoryPathJaccardIndex());
 
+		MLCategoryJaccardDistance metric = new MLCategoryJaccardDistance();
 		KernelRegressionBasedGiftRecommender<MLCategory> kernelRegressionBasedGiftRecommender = new KernelRegressionBasedGiftRecommender<MLCategory>(
-				recommendableGifts, new MLCategoryJaccardDistance());
+				recommendableGifts, metric);
 		GiftRecommender<MLCategory> kernelFilteredRegressionBasedGiftRecommender = new KNNFilterOutGiftRecommender(
-				recommendableGifts, new MLCategoryJaccardDistance());
+				recommendableGifts, metric);
 
-		GiftRecommender<MLCategory> giftRecommender = kernelRegressionBasedGiftRecommender;
+		YesNoGiftRecommender<MLCategory> yesNoGiftRecommender = new YesNoGiftRecommender<MLCategory>(
+				recommendableGifts, metric);
+		GiftRecommender<MLCategory> giftRecommender = yesNoGiftRecommender;
 
-		int n = 3;
+		int n = 5;
 		Set<GiftRecommendation<MLCategory>> input = Sets.newHashSet();
 		Set<GiftRecommendation<MLCategory>> recommendations = giftRecommender
 				.recommend(input, n);

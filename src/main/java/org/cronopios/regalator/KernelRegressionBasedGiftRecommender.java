@@ -1,6 +1,8 @@
 package org.cronopios.regalator;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -9,10 +11,16 @@ import java.util.Set;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.stat.Frequency;
+import org.cronopios.regalator.ml.MLCategory;
+import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
 
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 
 /**
  * Each gift has a user score and a certainty (GiftPoint). The user score is a
@@ -42,14 +50,16 @@ import com.google.common.collect.Sets;
  * 
  * @param <T>
  */
-public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<T> {
+public class KernelRegressionBasedGiftRecommender<T> implements
+		GiftRecommender<T> {
 
 	private List<T> gifts;
 	private Map<T, GiftPoint<T>> giftSpace = Maps.newHashMap();
 	private Random random = new Random(0);
 	private GiftRecommender<T> start;
 	private Metric<T> metric;
-	private UnivariateFunction scoreKernel = new Gaussian(0d, 1d / (5 * Math.sqrt(2 * Math.PI)));
+	private UnivariateFunction scoreKernel = new Gaussian(0d,
+			1d / (Math.sqrt(2 * Math.PI)));
 	private UnivariateFunction certaintyKernel = new UnivariateFunction() {
 
 		@Override
@@ -70,7 +80,8 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 	}
 
 	@Override
-	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
+	public Set<GiftRecommendation<T>> recommend(
+			Set<GiftRecommendation<T>> previousRecommendations, int n) {
 		if (previousRecommendations.isEmpty()) {
 			return this.getStart().recommend(previousRecommendations, n);
 		}
@@ -78,6 +89,8 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 		populateFacts(previousRecommendations);
 		estimateUserScores(previousRecommendations);
 		estimateRecommendability();
+
+		printImpact(previousRecommendations);
 
 		// return drawRecommendations(n);
 		return drawRecommendations(n, makeGiftDistribution());
@@ -87,18 +100,23 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 		Set<GiftRecommendation<T>> out = Sets.newHashSet();
 		List<GiftPoint<T>> maxProbableGifts = this.maxProbableGifts(n);
 		for (GiftPoint<T> giftPoint : maxProbableGifts) {
-			out.add(new GiftRecommendation<T>(giftPoint.getGift(), giftPoint.getRecommendability()));
+			out.add(new GiftRecommendation<T>(giftPoint.getGift(), giftPoint
+					.getRecommendability()));
 		}
 		return out;
 	}
 
-	private Set<GiftRecommendation<T>> drawRecommendations(int n, SimpleCategoricalProbabilityDistribution<GiftPoint<T>> probabilityDistribution) {
+	private Set<GiftRecommendation<T>> drawRecommendations(
+			int n,
+			SimpleCategoricalProbabilityDistribution<GiftPoint<T>> probabilityDistribution) {
 		Set<GiftRecommendation<T>> drawRecommendations = drawRecommendations(1);
-		System.out.println("max probable: " + drawRecommendations.iterator().next());
+		System.out.println("max probable: "
+				+ drawRecommendations.iterator().next());
 		Set<GiftRecommendation<T>> out = Sets.newHashSet();
 		for (int i = 0; i < n; i++) {
 			GiftPoint<T> next = probabilityDistribution.next();
-			out.add(new GiftRecommendation<T>(next.getGift(), next.getRecommendability()));
+			out.add(new GiftRecommendation<T>(next.getGift(), next
+					.getRecommendability()));
 		}
 
 		return out;
@@ -110,24 +128,29 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 		for (GiftPoint<T> giftPoint : points) {
 			pmf.put(giftPoint, giftPoint.getRecommendability());
 		}
-		SimpleCategoricalProbabilityDistribution<GiftPoint<T>> probabilityDistribution = new SimpleCategoricalProbabilityDistribution<GiftPoint<T>>(pmf, this.getRandom());
+		SimpleCategoricalProbabilityDistribution<GiftPoint<T>> probabilityDistribution = new SimpleCategoricalProbabilityDistribution<GiftPoint<T>>(
+				pmf, this.getRandom());
 
 		return probabilityDistribution;
 
 	}
 
 	private List<GiftPoint<T>> maxProbableGifts(int n) {
-		Ordering<GiftPoint<T>> recommendabilityOrdering = Ordering.from(new Comparator<GiftPoint<T>>() {
+		Ordering<GiftPoint<T>> recommendabilityOrdering = Ordering
+				.from(new Comparator<GiftPoint<T>>() {
 
-			@Override
-			public int compare(GiftPoint<T> o1, GiftPoint<T> o2) {
-				return Double.compare(o1.getRecommendability(), o2.getRecommendability());
-			}
-		});
-		List<GiftPoint<T>> sortedCopy = recommendabilityOrdering.reverse().sortedCopy(this.getPoints());
+					@Override
+					public int compare(GiftPoint<T> o1, GiftPoint<T> o2) {
+						return Double.compare(o1.getRecommendability(),
+								o2.getRecommendability());
+					}
+				});
+		List<GiftPoint<T>> sortedCopy = recommendabilityOrdering.reverse()
+				.sortedCopy(this.getPoints());
 		for (int i = 0; i < 100; i++) {
 			GiftPoint<T> giftPoint = sortedCopy.get(i);
-			System.out.println(giftPoint.getGift() + " " + giftPoint.getRecommendability());
+			System.out.println(giftPoint.getGift() + " "
+					+ giftPoint.getRecommendability());
 		}
 		return recommendabilityOrdering.greatestOf(this.getPoints(), n);
 	}
@@ -158,15 +181,16 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 		// Compute the weight of each gift and total sum for post-normalization.
 		// When certainty is 0, w must be almost 0, far lower than the minimum
 		// normalizedScore
-		double alpha = minNormalizedScore > 0 ? minNormalizedScore * 10 : 1d / n;
-		alpha = 1d / (10 * n);
+		double alpha = minNormalizedScore > 0 ? minNormalizedScore : 1d / n;
+		// alpha = 1d / (10 * n);
 		double wSum = 0d;
 		for (GiftPoint<T> giftPoint : this.getPoints()) {
 			if (giftPoint.getCertainty() == 1d)
 				continue;
 
 			Double normalizedScore = giftPoint.getPredictedScore() / scoreSum;
-			double w = (1 - giftPoint.getCertainty()) * alpha + giftPoint.getCertainty() * normalizedScore;
+			double w = (1 - giftPoint.getCertainty()) * alpha
+					+ giftPoint.getCertainty() * normalizedScore;
 
 			wSum += w;
 		}
@@ -179,7 +203,8 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 				continue;
 
 			Double normalizedScore = giftPoint.getPredictedScore() / scoreSum;
-			double w = (1 - giftPoint.getCertainty()) * alpha + giftPoint.getCertainty() * normalizedScore;
+			double w = (1 - giftPoint.getCertainty()) * alpha
+					+ giftPoint.getCertainty() * normalizedScore;
 
 			double recommendability = w / wSum;
 			giftPoint.setRecommendability(recommendability);
@@ -203,16 +228,56 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 		return minNormalizedScore;
 	}
 
-	private void populateFacts(Set<GiftRecommendation<T>> previousRecommendations) {
+	private void populateFacts(
+			Set<GiftRecommendation<T>> previousRecommendations) {
 		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
-			GiftPoint<T> giftPoint = this.getGiftSpace().get(giftRecommendation.getGift());
+			GiftPoint<T> giftPoint = this.getGiftSpace().get(
+					giftRecommendation.getGift());
 			giftPoint.setPredictedScore(giftRecommendation.getUserScore());
 			giftPoint.setCertainty(1d);
 			giftPoint.setRecommendability(0d);
 		}
+
 	}
 
-	private void estimateUserScores(Set<GiftRecommendation<T>> previousRecommendations) {
+	private void printImpact(Set<GiftRecommendation<T>> previousRecommendations) {
+		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
+			GiftPoint<T> giftPoint = this.getGiftSpace().get(
+					giftRecommendation.getGift());
+			Multimap<Double, GiftPoint<T>> distancePoints = LinkedHashMultimap
+					.create();
+			Collection<GiftPoint<T>> points = this.getGiftSpace().values();
+			final MLCategoryJaccardDistance d = new MLCategoryJaccardDistance();
+			for (GiftPoint<T> p : points) {
+				double distance = d.compute((MLCategory) p.getGift(),
+						(MLCategory) giftPoint.getGift());
+				distancePoints.put(distance, p);
+			}
+
+			List<Double> allDistances = Ordering.natural().sortedCopy(
+					distancePoints.keySet());
+			for (Double distance : allDistances) {
+				Collection<GiftPoint<T>> pointsAtDistance = distancePoints
+						.get(distance);
+				System.out.println(distance + "(" + pointsAtDistance.size()
+						+ ")");
+				int n = Math.min(1, points.size());
+				int i = 0;
+				for (Iterator<GiftPoint<T>> iterator = pointsAtDistance
+						.iterator(); iterator.hasNext() && i < n;) {
+					GiftPoint<T> q = iterator.next();
+					i++;
+					System.out.println(q.getCertainty() + ", "
+							+ q.getPredictedScore() + ", "
+							+ q.getRecommendability());
+				}
+			}
+
+		}
+	}
+
+	private void estimateUserScores(
+			Set<GiftRecommendation<T>> previousRecommendations) {
 		for (GiftPoint<T> x : this.getPoints()) {
 			if (x.getCertainty() == 1d)
 				continue;
@@ -221,7 +286,8 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 
 	}
 
-	public void estimateUserScore(GiftPoint<T> x, Set<GiftRecommendation<T>> previousRecommendations) {
+	public void estimateUserScore(GiftPoint<T> x,
+			Set<GiftRecommendation<T>> previousRecommendations) {
 
 		double scoreDistanceWeightsSum = 0d;
 		double certaintyDistanceWeightsSum = 0d;
@@ -231,24 +297,36 @@ public class KernelRegressionBasedGiftRecommender<T> implements GiftRecommender<
 		double count = 0;
 		for (GiftRecommendation<T> pr : previousRecommendations) {
 			GiftPoint<T> y = this.getGiftSpace().get(pr.getGift());
-			double xyDistance = this.getMetric().compute(x.getGift(), y.getGift());
+			double xyDistance = this.getMetric().compute(x.getGift(),
+					y.getGift());
 
-			double scoreDistanceWeight = this.getScoreKernel().value(xyDistance);
+			double scoreDistanceWeight = this.getScoreKernel()
+					.value(xyDistance);
 			scoreDistanceWeightsSum += scoreDistanceWeight;
-			double distanceWeightedUserScore = scoreDistanceWeight * y.getPredictedScore();
+			double distanceWeightedUserScore = scoreDistanceWeight
+					* y.getPredictedScore();
 
-			double certaintyDistanceWeight = this.getCertaintyKernel().value(xyDistance);
+			System.out.println(distanceWeightedUserScore);
+			double certaintyDistanceWeight = this.getCertaintyKernel().value(
+					xyDistance);
 			certaintyDistanceWeightsSum += certaintyDistanceWeight;
 
-			double distanceWeightedCertainty = certaintyDistanceWeight * y.getCertainty();
+			double distanceWeightedCertainty = certaintyDistanceWeight
+					* y.getCertainty();
 
 			distanceWeightedUserScoreSum += distanceWeightedUserScore;
 			distanceWeightedCertaintySum += distanceWeightedCertainty;
 			count++;
 		}
-		double nadarayaWatsonDistanceWeightedUserScore = distanceWeightedUserScoreSum / scoreDistanceWeightsSum;
-		double avgDistanceWeightedCertainty = distanceWeightedCertaintySum / count;
-		x.setPredictedScore(nadarayaWatsonDistanceWeightedUserScore);
+		double avgDistanceWeightedUserScore = distanceWeightedUserScoreSum
+				/ count;
+		// double nadarayaWatsonDistanceWeightedUserScore =
+		// distanceWeightedUserScoreSum
+		// / scoreDistanceWeightsSum;
+		double avgDistanceWeightedCertainty = distanceWeightedCertaintySum
+				/ count;
+		System.out.println(avgDistanceWeightedUserScore);
+		x.setPredictedScore(avgDistanceWeightedUserScore);
 		x.setCertainty(avgDistanceWeightedCertainty);
 	}
 
