@@ -12,15 +12,12 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.stat.Frequency;
 import org.cronopios.regalator.ml.MLCategory;
-import org.cronopios.regalator.ml.MLCategoryJaccardDistance;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
 
 /**
  * Each gift has a user score and a certainty (GiftPoint). The user score is a
@@ -247,7 +244,7 @@ public class KernelRegressionBasedGiftRecommender<T> implements
 			Multimap<Double, GiftPoint<T>> distancePoints = LinkedHashMultimap
 					.create();
 			Collection<GiftPoint<T>> points = this.getGiftSpace().values();
-			final MLCategoryJaccardDistance d = new MLCategoryJaccardDistance();
+			final CanonicalCategoryJaccardDistance d = new CanonicalCategoryJaccardDistance();
 			for (GiftPoint<T> p : points) {
 				double distance = d.compute((MLCategory) p.getGift(),
 						(MLCategory) giftPoint.getGift());

@@ -1,4 +1,5 @@
 package org.cronopios.regalator;
+
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -16,48 +17,57 @@ public class WeightedRandomGiftRecommender<T> implements GiftRecommender<T> {
 	private KNNRetriever<T> knnRetriever;
 	private int k = 5;
 
-	public WeightedRandomGiftRecommender(List<T> gifts, SimilarityMeasure<T> similarityMeasure) {
+	public WeightedRandomGiftRecommender(List<T> gifts, Metric<T> metric) {
 		this.setGifts(Lists.newArrayList(gifts));
 		this.setStart(new UniformRandomGiftRecommender<T>(this.getGifts()));
-		this.setKnnRetriever(new FullScanKNNRetriever<T>(this.getGifts(), similarityMeasure));
+		this.setKnnRetriever(new MetricBasedFullScanKNNRetriever<T>(this
+				.getGifts(), metric));
 	}
 
 	@Override
-	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
+	public Set<GiftRecommendation<T>> recommend(
+			Set<GiftRecommendation<T>> previousRecommendations, int n) {
 		Set<GiftRecommendation<T>> out = Sets.newHashSet();
 		removeRejectedCandidates(previousRecommendations);
 		double totalScore = 0;
-		ListMultimap<GiftRecommendation<T>, T> candidates = LinkedListMultimap.create();
+		ListMultimap<GiftRecommendation<T>, T> candidates = LinkedListMultimap
+				.create();
 		for (GiftRecommendation<T> prevRec : previousRecommendations) {
 			if (prevRec.getUserScore() == 0d)
 				continue;
 			Double userScore = prevRec.getUserScore();
 			int kn = (int) Math.round((this.getK() * 1d / userScore));
-			List<T> retrieve = this.getKnnRetriever().retrieve(prevRec.getGift(), kn);
+			List<T> retrieve = this.getKnnRetriever().retrieve(
+					prevRec.getGift(), kn);
 			candidates.putAll(prevRec, retrieve);
 			totalScore += userScore;
 		}
 		for (GiftRecommendation<T> prevRec : previousRecommendations) {
-			int sampleSize = (int) Math.round((n - 1) * (prevRec.getUserScore() / totalScore));
+			int sampleSize = (int) Math.round((n - 1)
+					* (prevRec.getUserScore() / totalScore));
 			List<T> prevRecCandidates = candidates.get(prevRec);
 
 			for (int i = 0; i < sampleSize; i++) {
-				T gift = prevRecCandidates.get(this.getRandom().nextInt(prevRecCandidates.size()));
+				T gift = prevRecCandidates.get(this.getRandom().nextInt(
+						prevRecCandidates.size()));
 				prevRecCandidates.remove(gift);
 				out.add(new GiftRecommendation<T>(gift, 1));
 				this.getGifts().remove(gift);
 			}
 		}
-		out.addAll(this.getStart().recommend(previousRecommendations, n - out.size()));
+		out.addAll(this.getStart().recommend(previousRecommendations,
+				n - out.size()));
 		return out;
 
 	}
 
-	private void removeRejectedCandidates(Set<GiftRecommendation<T>> previousRecommendations) {
+	private void removeRejectedCandidates(
+			Set<GiftRecommendation<T>> previousRecommendations) {
 		for (GiftRecommendation<T> prevRec : previousRecommendations) {
 			Double userScore = prevRec.getUserScore();
 			if (userScore.equals(0d)) {
-				List<T> retrieve = this.getKnnRetriever().retrieve(prevRec.getGift(), k);
+				List<T> retrieve = this.getKnnRetriever().retrieve(
+						prevRec.getGift(), k);
 				this.getGifts().removeAll(retrieve);
 			}
 		}

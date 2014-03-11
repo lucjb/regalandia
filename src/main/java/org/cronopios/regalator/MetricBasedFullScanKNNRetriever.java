@@ -1,18 +1,14 @@
 package org.cronopios.regalator;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.TreeMultimap;
 
 public class MetricBasedFullScanKNNRetriever<T> implements KNNRetriever<T> {
 

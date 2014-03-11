@@ -1,5 +1,6 @@
 package org.cronopios.regalator.ml.brands;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -12,7 +13,7 @@ public class FlagBasedBrandFilter {
 
 	private Set<String> brands = Sets.newHashSet();
 
-	public void filterBrands(List<MLCategory> categories) {
+	public void filter(Collection<MLCategory> categories) {
 		List<MLCategory> removed = Lists.newArrayList();
 		for (MLCategory mlCategory : categories) {
 			if (otrasMarcasAmongChildren(mlCategory.getChildren_categories())) {

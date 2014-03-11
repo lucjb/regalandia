@@ -2,16 +2,17 @@ package org.cronopios.regalator.ml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.cronopios.regalator.ml.brands.VocabularyParser;
+import org.cronopios.regalator.CanonicalCategoryWeighter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,49 +24,14 @@ import com.google.gson.JsonParser;
 
 public class MLCategoryParser {
 
-	public static void main(String[] args) throws IOException {
-		VocabularyParser vocabularyParser = new VocabularyParser();
-		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulary.txt");
-
-		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-
-		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
-
-		// exportCategories(allMlCategories);
-
-		int discarded = 0;
-		for (MLCategory mlCategory : allMlCategories) {
-			if (mlCategory.isLeaf()) {
-				boolean isBrand = isBrand(vocabulary, mlCategory);
-				if (isBrand) {
-					discarded++;
-					System.out.println(mlCategory);
-				}
-			}
-		}
-		System.out.println(discarded);
-
-	}
-
-	private static boolean isBrand(Set<String> vocabulary, MLCategory mlCategory) {
-		String name = mlCategory.getName();
-		String lowerCase = name.toLowerCase();
-		String[] split = lowerCase.split(" ");
-		boolean isBrand = false;
-		for (String string : split) {
-			boolean inVocabulary = vocabulary.contains(string);
-			if (!inVocabulary) {
-				isBrand = true;
-			}
-		}
-		return isBrand;	
-	}
-
-	private static void exportCategories(List<MLCategory> allMlCategories) throws IOException {
+	private static void exportCategories(List<MLCategory> allMlCategories)
+			throws IOException {
 		Writer fileWriter = new FileWriter(new File("mlcattree.txt"));
 		for (MLCategory mlCategory : allMlCategories) {
 			if (mlCategory.isRoot()) {
-				System.out.println(mlCategory + " " + mlCategory.getChildren_categories().size() + " " + mlCategory.getTotal_items_in_this_category());
+				System.out.println(mlCategory + " "
+						+ mlCategory.getChildren_categories().size() + " "
+						+ mlCategory.getTotal_items_in_this_category());
 				print(mlCategory, fileWriter);
 			}
 		}
@@ -73,19 +39,24 @@ public class MLCategoryParser {
 		fileWriter.close();
 	}
 
-	private static void print(MLCategory mlCategory, Writer writer) throws IOException {
+	private static void print(MLCategory mlCategory, Writer writer)
+			throws IOException {
 		String string = mlCategory.toString();
 		writer.write(string + "\n");
-		Set<MLCategory> children_categories = mlCategory.getChildren_categories();
+		Set<MLCategory> children_categories = mlCategory
+				.getChildren_categories();
 		for (MLCategory child : children_categories) {
 			print(child, writer);
 		}
 
 	}
 
-	public List<MLCategory> parseMLCategories(String fileName) throws FileNotFoundException {
+	public List<MLCategory> parseMLCategories(String fileName)
+			throws FileNotFoundException {
+
 		List<MLCategory> allMlCategories = Lists.newLinkedList();
-		FileReader fileRader = new FileReader(new File(fileName));
+		Reader fileRader = new InputStreamReader(this.getClass()
+				.getResourceAsStream("ml-categories-ar.json"));
 		JsonParser parser = new JsonParser();
 		JsonElement root = parser.parse(fileRader);
 		JsonObject rootObject = root.getAsJsonObject();
@@ -96,20 +67,50 @@ public class MLCategoryParser {
 			MLCategory mlCat = gson.fromJson(asJsonObject, MLCategory.class);
 			allMlCategories.add(mlCat);
 		}
-		Map<String, MLCategory> idCat = Maps.newHashMap();
-		for (MLCategory mlCategory : allMlCategories) {
-			idCat.put(mlCategory.getId(), mlCategory);
-		}
+		Map<String, MLCategory> idCat = this.indexCategories(allMlCategories);
 
+		this.populateChildrenAndAncestors(allMlCategories, idCat);
+
+		this.populateWeights(allMlCategories);
+		return allMlCategories;
+	}
+
+	private void populateWeights(List<MLCategory> allMlCategories) {
+		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(
+				allMlCategories, 3d / 4d);
 		for (MLCategory mlCategory : allMlCategories) {
-			Set<MLCategory> children_categories = mlCategory.getChildren_categories();
+			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory));
+		}
+	}
+
+	private void populateChildrenAndAncestors(List<MLCategory> allMlCategories,
+			Map<String, MLCategory> idCat) {
+		for (MLCategory mlCategory : allMlCategories) {
+			Set<MLCategory> children_categories = mlCategory
+					.getChildren_categories();
 			Set<MLCategory> childrenWithChildren = Sets.newLinkedHashSet();
 			for (MLCategory child : children_categories) {
 				MLCategory childWithChildren = idCat.get(child.getId());
 				childrenWithChildren.add(childWithChildren);
 			}
 			mlCategory.setChildren_categories(childrenWithChildren);
+
+			List<MLCategory> path_from_root = mlCategory.getPath_from_root();
+			List<MLCategory> ancestorsWithAncestors = Lists.newArrayList();
+			for (MLCategory ancestor : path_from_root) {
+				MLCategory ancestorWithAncestors = idCat.get(ancestor.getId());
+				ancestorsWithAncestors.add(ancestorWithAncestors);
+			}
+			mlCategory.setPath_from_root(ancestorsWithAncestors);
 		}
-		return allMlCategories;
+	}
+
+	private Map<String, MLCategory> indexCategories(
+			List<MLCategory> allMlCategories) {
+		Map<String, MLCategory> idCat = Maps.newHashMap();
+		for (MLCategory mlCategory : allMlCategories) {
+			idCat.put(mlCategory.getId(), mlCategory);
+		}
+		return idCat;
 	}
 }
