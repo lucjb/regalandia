@@ -21,7 +21,7 @@ public class CanonicalCategoryWeighterTest {
 
 		System.out.println(allMlCategories.size());
 		CanonicalCategoryWeighter weighter = new CanonicalCategoryWeighter(
-				allMlCategories);
+				allMlCategories, 1d);
 
 		double totalWeight = 0;
 		for (MLCategory mlCategory : allMlCategories) {
@@ -33,5 +33,4 @@ public class CanonicalCategoryWeighterTest {
 		}
 		Assert.assertEquals(1d, totalWeight, 10E-7);
 	}
-
 }

@@ -56,4 +56,9 @@ public class MLCategory extends AbstractCanonicalCategory {
 		return this.getPath_from_root();
 	}
 
+	@Override
+	public double weight() {
+		return super.weight() * this.getTotal_items_in_this_category();
+	}
+
 }

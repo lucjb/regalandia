@@ -152,4 +152,9 @@ public class IceCatCategory extends AbstractCanonicalCategory {
 	public boolean isRoot() {
 		return this.getParent() == null;
 	}
+
+	@Override
+	public double weight() {
+		return super.weight() * this.getScore();
+	}
 }

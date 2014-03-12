@@ -36,7 +36,7 @@ public class InteractiveRegalator {
 		Collection<CanonicalCategory> all = Lists.newLinkedList();
 
 		all.addAll(mlCategories);
-		all.addAll(iceCategories);
+		// all.addAll(iceCategories);
 
 		GiftWeighter<CanonicalCategory> giftWeighter = new WeightableWeighter();
 		CanonicalCategoryJaccardDistance metric = new CanonicalCategoryJaccardDistance();
@@ -54,7 +54,8 @@ public class InteractiveRegalator {
 
 		while (true) {
 			for (GiftRecommendation<CanonicalCategory> giftRecommendation : recommendations) {
-				System.out.println(giftRecommendation);
+				System.out.println(giftRecommendation.getGift().isLeaf()
+						+ "   " + giftRecommendation);
 				System.out.print("Regalabilidad? (0-1):");
 				String userInput = br.readLine();
 				System.out.println();
@@ -93,10 +94,9 @@ public class InteractiveRegalator {
 		new CategoryStringFilter("Servicios", "Medicina y Salud")
 				.filter(mlCategories);
 		new CategoryStringFilter("Servicios", "Transporte")
-		.filter(mlCategories);
-		
-		
-		new FlagBasedBrandFilter().filter(mlCategories);
+				.filter(mlCategories);
+
+		// new FlagBasedBrandFilter().filter(mlCategories);
 		new NoLeafFilter().filter(mlCategories);
 
 		printMLStats(mlCategories);
