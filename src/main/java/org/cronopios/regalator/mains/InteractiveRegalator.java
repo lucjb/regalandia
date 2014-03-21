@@ -23,7 +23,6 @@ import org.cronopios.regalator.icecat.IceCatCategory;
 import org.cronopios.regalator.icecat.IceCatParser;
 import org.cronopios.regalator.ml.MLCategory;
 import org.cronopios.regalator.ml.MLCategoryParser;
-import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -36,7 +35,7 @@ public class InteractiveRegalator {
 		Collection<CanonicalCategory> all = Lists.newLinkedList();
 
 		all.addAll(mlCategories);
-		// all.addAll(iceCategories);
+		all.addAll(iceCategories);
 
 		GiftWeighter<CanonicalCategory> giftWeighter = new WeightableWeighter();
 		CanonicalCategoryJaccardDistance metric = new CanonicalCategoryJaccardDistance();

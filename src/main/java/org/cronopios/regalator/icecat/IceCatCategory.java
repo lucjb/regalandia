@@ -39,7 +39,7 @@ public class IceCatCategory extends AbstractCanonicalCategory {
 			String thumbnailPic, String uncatid, boolean visible,
 			String description, String name, int parentCategoryId, int level) {
 		super();
-		this.setId(String.valueOf(id));
+		this.setId("ICECAT" + String.valueOf(id));
 		this.setName(name);
 		this.lowPic = lowPic;
 		this.score = score;
@@ -155,6 +155,11 @@ public class IceCatCategory extends AbstractCanonicalCategory {
 
 	@Override
 	public double weight() {
-		return super.weight() * this.getScore();
+		return super.weight();
+	}
+
+	@Override
+	public String getImageURL() {
+		return this.getLowPic();
 	}
 }

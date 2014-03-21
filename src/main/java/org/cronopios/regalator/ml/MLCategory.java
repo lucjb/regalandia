@@ -14,6 +14,7 @@ public class MLCategory extends AbstractCanonicalCategory {
 	private List<MLCategory> path_from_root;
 	private Set<MLCategory> children_categories = Sets.newLinkedHashSet();
 	private int total_items_in_this_category;
+	private String picture;
 
 	public List<MLCategory> getPath_from_root() {
 		return path_from_root;
@@ -58,7 +59,20 @@ public class MLCategory extends AbstractCanonicalCategory {
 
 	@Override
 	public double weight() {
-		return super.weight() * this.getTotal_items_in_this_category();
+		return super.weight();
+	}
+
+	@Override
+	public String getImageURL() {
+		return this.getPicture();
+	}
+
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
 	}
 
 }

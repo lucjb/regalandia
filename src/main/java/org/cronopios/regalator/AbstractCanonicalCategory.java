@@ -11,8 +11,8 @@ public abstract class AbstractCanonicalCategory implements CanonicalCategory {
 	@Override
 	public String toString() {
 		StringBuilder ts = new StringBuilder();
-		for (CanonicalCategory ancesotor : this.getPathFromRoot()) {
-			ts.append(ancesotor.getName()).append(">");
+		for (CanonicalCategory ancestor : this.getPathFromRoot()) {
+			ts.append(ancestor.getName()).append(">");
 		}
 		return ts.toString();
 	}
@@ -81,6 +81,11 @@ public abstract class AbstractCanonicalCategory implements CanonicalCategory {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@Override
+	public String getTitle() {
+		return this.getName();
 	}
 
 }

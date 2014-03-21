@@ -3,9 +3,7 @@ package org.cronopios.regalator;
 import java.util.Collection;
 import java.util.List;
 
-public interface CanonicalCategory {
-
-	public String getId();
+public interface CanonicalCategory extends Gift{
 
 	public String getName();
 

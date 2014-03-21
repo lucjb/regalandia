@@ -70,7 +70,6 @@ public class MLCategoryParser {
 		Map<String, MLCategory> idCat = this.indexCategories(allMlCategories);
 
 		this.populateChildrenAndAncestors(allMlCategories, idCat);
-
 		this.populateWeights(allMlCategories);
 		return allMlCategories;
 	}
