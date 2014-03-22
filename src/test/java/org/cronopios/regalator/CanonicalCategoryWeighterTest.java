@@ -14,21 +14,17 @@ public class CanonicalCategoryWeighterTest {
 	@Test
 	public void testWeighter() throws Exception {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> allMlCategories = mlCategoryParser
-				.parseMLCategories("all");
+		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories();
 		new OtrosFilter().filter(allMlCategories);
 		new FlagBasedBrandFilter().filter(allMlCategories);
 
-		System.out.println(allMlCategories.size());
-		CanonicalCategoryWeighter weighter = new CanonicalCategoryWeighter(
-				allMlCategories, 1d);
+		CanonicalCategoryWeighter weighter = new CanonicalCategoryWeighter(allMlCategories, 1d);
 
 		double totalWeight = 0;
 		for (MLCategory mlCategory : allMlCategories) {
 			if (mlCategory.isLeaf()) {
 				double weight = weighter.weight(mlCategory);
 				totalWeight += weight;
-				// System.out.println(mlCategory + "  " + weight);
 			}
 		}
 		Assert.assertEquals(1d, totalWeight, 10E-7);

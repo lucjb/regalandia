@@ -6,7 +6,7 @@ import org.cronopios.regalator.CanonicalCategory;
 
 import com.google.common.collect.Lists;
 
-public class CategoryStringFilter extends AbstractCanonicalCategoryFilter {
+public class CategoryStringFilter extends AbstractCanonicalCategoryFilter<CanonicalCategory> {
 
 	String[] namesInPath;
 
@@ -15,8 +15,7 @@ public class CategoryStringFilter extends AbstractCanonicalCategoryFilter {
 	}
 
 	@Override
-	public Collection<CanonicalCategory> selectCategoriesToRemove(
-			Collection<? extends CanonicalCategory> categories) {
+	public Collection<CanonicalCategory> selectCategoriesToRemove(Collection<? extends CanonicalCategory> categories) {
 		Collection<CanonicalCategory> selection = Lists.newArrayList();
 
 		for (CanonicalCategory category : categories) {

@@ -1,6 +1,7 @@
 package org.cronopios.regalator.ml;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ public class MLCategory extends AbstractCanonicalCategory {
 	private Set<MLCategory> children_categories = Sets.newLinkedHashSet();
 	private int total_items_in_this_category;
 	private String picture;
+	private MLSettings settings;
 
 	public List<MLCategory> getPath_from_root() {
 		return path_from_root;
@@ -43,8 +45,7 @@ public class MLCategory extends AbstractCanonicalCategory {
 	public MLCategory getParent() {
 		if (this.isRoot())
 			return null;
-		return this.getPath_from_root()
-				.get(this.getPath_from_root().size() - 2);
+		return this.getPath_from_root().get(this.getPath_from_root().size() - 2);
 	}
 
 	@Override
@@ -62,9 +63,22 @@ public class MLCategory extends AbstractCanonicalCategory {
 		return super.weight();
 	}
 
+	private String ancestorsPicture = "";
+
 	@Override
 	public String getImageURL() {
-		return this.getPicture();
+		if (this.getAncestorsPicture() == "") {
+			this.setAncestorsPicture(null);
+			List<MLCategory> path_from_root2 = this.getPath_from_root();
+			for (int i = path_from_root2.size() - 1; i > -1; i--) {
+				String p = path_from_root2.get(i).getPicture();
+				if (p != null) {
+					this.setAncestorsPicture(p);
+					return this.getAncestorsPicture();
+				}
+			}
+		}
+		return this.getAncestorsPicture();
 	}
 
 	public String getPicture() {
@@ -73,6 +87,22 @@ public class MLCategory extends AbstractCanonicalCategory {
 
 	public void setPicture(String picture) {
 		this.picture = picture;
+	}
+
+	public MLSettings getSettings() {
+		return settings;
+	}
+
+	public void setSettings(MLSettings settings) {
+		this.settings = settings;
+	}
+
+	public String getAncestorsPicture() {
+		return ancestorsPicture;
+	}
+
+	public void setAncestorsPicture(String ancestorsPicture) {
+		this.ancestorsPicture = ancestorsPicture;
 	}
 
 }

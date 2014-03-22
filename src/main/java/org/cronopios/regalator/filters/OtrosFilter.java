@@ -7,11 +7,10 @@ import org.cronopios.regalator.CanonicalCategory;
 
 import com.google.common.collect.Lists;
 
-public class OtrosFilter extends AbstractCanonicalCategoryFilter {
+public class OtrosFilter extends AbstractCanonicalCategoryFilter<CanonicalCategory> {
 
 	@Override
-	public Collection<CanonicalCategory> selectCategoriesToRemove(
-			Collection<? extends CanonicalCategory> categories) {
+	public Collection<? extends CanonicalCategory> selectCategoriesToRemove(Collection<? extends CanonicalCategory> categories) {
 		List<CanonicalCategory> toRemove = Lists.newArrayList();
 		for (CanonicalCategory category : categories) {
 			if (category.isFor("Otros") || category.isFor("Otras")) {

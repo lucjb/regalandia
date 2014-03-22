@@ -16,13 +16,15 @@ import org.cronopios.regalator.GiftWeighter;
 import org.cronopios.regalator.KNearestSpheresYesNoGiftRecommender;
 import org.cronopios.regalator.NeighboursWithinSphereYesNoGiftRecommender;
 import org.cronopios.regalator.WeightableWeighter;
-import org.cronopios.regalator.filters.CategoryStringFilter;
 import org.cronopios.regalator.filters.NoLeafFilter;
 import org.cronopios.regalator.filters.OtrosFilter;
 import org.cronopios.regalator.icecat.IceCatCategory;
 import org.cronopios.regalator.icecat.IceCatParser;
 import org.cronopios.regalator.ml.MLCategory;
 import org.cronopios.regalator.ml.MLCategoryParser;
+import org.cronopios.regalator.ml.MLNullPictureFilter;
+import org.cronopios.regalator.ml.MLTagsFilter;
+import org.cronopios.regalator.ml.MLVipSubDomainFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -30,31 +32,28 @@ import com.google.common.collect.Sets;
 public class InteractiveRegalator {
 
 	public static void main(String[] args) throws IOException {
-		Collection<CanonicalCategory> iceCategories = iceCategories();
+		// Collection<CanonicalCategory> iceCategories = iceCategories();
 		Collection<CanonicalCategory> mlCategories = mercadoLibreTargetCategories();
 		Collection<CanonicalCategory> all = Lists.newLinkedList();
 
 		all.addAll(mlCategories);
-		all.addAll(iceCategories);
+		// all.addAll(iceCategories);
 
 		GiftWeighter<CanonicalCategory> giftWeighter = new WeightableWeighter();
 		CanonicalCategoryJaccardDistance metric = new CanonicalCategoryJaccardDistance();
 
-		KNearestSpheresYesNoGiftRecommender<CanonicalCategory> yesNoGiftRecommender = new NeighboursWithinSphereYesNoGiftRecommender<CanonicalCategory>(
-				all, metric, giftWeighter);
+		KNearestSpheresYesNoGiftRecommender<CanonicalCategory> yesNoGiftRecommender = new NeighboursWithinSphereYesNoGiftRecommender<CanonicalCategory>(all, metric, giftWeighter);
 		GiftRecommender<CanonicalCategory> giftRecommender = yesNoGiftRecommender;
 
 		int n = 5;
 		Set<GiftRecommendation<CanonicalCategory>> input = Sets.newHashSet();
-		Set<GiftRecommendation<CanonicalCategory>> recommendations = giftRecommender
-				.recommend(input, n);
+		Set<GiftRecommendation<CanonicalCategory>> recommendations = giftRecommender.recommend(input, n);
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		while (true) {
 			for (GiftRecommendation<CanonicalCategory> giftRecommendation : recommendations) {
-				System.out.println(giftRecommendation.getGift().isLeaf()
-						+ "   " + giftRecommendation);
+				System.out.println(giftRecommendation.getGift().isLeaf() + "   " + giftRecommendation);
 				System.out.print("Regalabilidad? (0-1):");
 				String userInput = br.readLine();
 				System.out.println();
@@ -72,31 +71,40 @@ public class InteractiveRegalator {
 		}
 	}
 
-	private static Collection<CanonicalCategory> iceCategories()
-			throws FileNotFoundException {
-		Collection<? extends IceCatCategory> iceCategories = new IceCatParser()
-				.parse();
+	private static Collection<CanonicalCategory> iceCategories() throws FileNotFoundException {
+		Collection<? extends IceCatCategory> iceCategories = new IceCatParser().parse();
 		new NoLeafFilter().filter(iceCategories);
 		return (Collection<CanonicalCategory>) iceCategories;
 	}
 
-	private static Collection<CanonicalCategory> mercadoLibreTargetCategories()
-			throws FileNotFoundException {
+	private static Collection<CanonicalCategory> mercadoLibreTargetCategories() throws FileNotFoundException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> mlCategories = mlCategoryParser
-				.parseMLCategories("all");
+		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories();
 
-		new OtrosFilter().filter(mlCategories);
-		new CategoryStringFilter("Inmuebles").filter(mlCategories);
-		new CategoryStringFilter("Servicios", "Profesionales")
-				.filter(mlCategories);
-		new CategoryStringFilter("Servicios", "Medicina y Salud")
-				.filter(mlCategories);
-		new CategoryStringFilter("Servicios", "Transporte")
-				.filter(mlCategories);
+		// new CategoryStringFilter("Inmuebles").filter(mlCategories);
+		// new CategoryStringFilter("Servicios", "Profesionales")
+		// .filter(mlCategories);
+		// new CategoryStringFilter("Servicios", "Medicina y Salud")
+		// .filter(mlCategories);
+		// new CategoryStringFilter("Servicios", "Transporte")
+		// .filter(mlCategories);
 
-		// new FlagBasedBrandFilter().filter(mlCategories);
+		new MLVipSubDomainFilter("servicio").filter(mlCategories);
+		new MLVipSubDomainFilter("casa").filter(mlCategories);
+		new MLVipSubDomainFilter("departamento").filter(mlCategories);
+		new MLVipSubDomainFilter("moto").filter(mlCategories);
+		new MLVipSubDomainFilter("serviciotecnico").filter(mlCategories);
+		new MLVipSubDomainFilter("auto").filter(mlCategories);
+		new MLVipSubDomainFilter("profesional").filter(mlCategories);
+		new MLVipSubDomainFilter("inmueble").filter(mlCategories);
+		new MLVipSubDomainFilter("terreno").filter(mlCategories);
+		new MLVipSubDomainFilter("vehiculo").filter(mlCategories);
+
+		new MLNullPictureFilter().filter(mlCategories);
 		new NoLeafFilter().filter(mlCategories);
+		// new FlagBasedBrandFilter().filter(mlCategories);
+		new MLTagsFilter().filter(mlCategories);
+		new OtrosFilter().filter(mlCategories);
 
 		printMLStats(mlCategories);
 		Collection<? extends CanonicalCategory> r = mlCategories;
@@ -131,10 +139,7 @@ public class InteractiveRegalator {
 			if (mlCategory.isFor("Mujer")) {
 				mujer++;
 			}
-			if (mlCategory.isFor("Otros")) {
-				otros++;
-			}
-			if (mlCategory.isFor("Otras")) {
+			if (mlCategory.getSettings().getTags().contains("others")) {
 				otros++;
 			}
 			if (!mlCategory.isLeaf()) {

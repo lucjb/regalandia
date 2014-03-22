@@ -14,10 +14,10 @@ import com.google.common.collect.Sets;
 public class CategoryTreeDotExporterMain {
 
 	private static Map<String, MLCategory> categoriesById;
-	
+
 	public static void main(String[] args) throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("all");
+		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories();
 
 		categoriesById = Maps.newLinkedHashMap();
 		Set<MLCategory> roots = Sets.newLinkedHashSet();
@@ -26,11 +26,11 @@ public class CategoryTreeDotExporterMain {
 			if (mlCategory.getPath_from_root().size() == 1)
 				roots.add(mlCategory);
 		}
-		
+
 		BufferedWriter writer = new BufferedWriter(new FileWriter("foo.dot"));
 		writer.write("digraph foo {");
 		writer.newLine();
-		
+
 		String globalRoot = "root";
 		int rootLevel = 1;
 		for (MLCategory root : roots) {
@@ -38,15 +38,15 @@ public class CategoryTreeDotExporterMain {
 			writer.newLine();
 			outputDFSCategory(root, rootLevel, writer);
 		}
-			
+
 		writer.write("};");
 		writer.close();
 	}
-	
+
 	private static void outputDFSCategory(MLCategory node, int level, BufferedWriter writer) throws IOException {
 		if (node.getChildren_categories() == null)
 			return;
-		
+
 		String nodeId = getNodeId(level, node);
 		for (MLCategory dummyChild : node.getChildren_categories()) {
 			MLCategory child = categoriesById.get(dummyChild.getId());
@@ -59,7 +59,7 @@ public class CategoryTreeDotExporterMain {
 			outputDFSCategory(child, childLevel, writer);
 		}
 	}
-	
+
 	private static String getNodeId(int level, MLCategory category) {
 		return String.format("\"%d-%s\"", level, category.getId());
 	}

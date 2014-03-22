@@ -10,14 +10,7 @@ import org.junit.Test;
 
 public class VocabularyTest {
 
-	@Test
-	public void testContains() throws FileNotFoundException {
-		VocabularyParser vocabularyParser = new VocabularyParser();
-		Set<String> vocabulary = vocabularyParser.parseVocabulary("vocabulariorae.txt");
-		DefaultVocabulary defaultVocabulary = new DefaultVocabulary(vocabulary);
-		Assert.assertTrue(defaultVocabulary.contains("artículos".trim()));
-	}
-
+	
 	@Test
 	public void testSplit() throws Exception {
 		String lowerCase = "def,ght, asd xcv";

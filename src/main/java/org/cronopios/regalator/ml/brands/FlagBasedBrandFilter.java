@@ -16,30 +16,28 @@ public class FlagBasedBrandFilter {
 	public void filter(Collection<MLCategory> categories) {
 		List<MLCategory> removed = Lists.newArrayList();
 		for (MLCategory mlCategory : categories) {
-			if (otrasMarcasAmongChildren(mlCategory.getChildren_categories())) {
-				removed.addAll(mlCategory.getChildren_categories());
-				this.registerBrandStrings(mlCategory.getChildren_categories());
-				mlCategory.getChildren_categories().clear();
+			MLCategory parent = mlCategory.getParent();
+			if (mlCategory.isLeaf() && otrasMarcasAmongChildren(parent.getChildren_categories())) {
+				removed.addAll(parent.getChildren_categories());
+				this.registerBrandStrings(parent.getChildren_categories());
+				parent.getChildren_categories().clear();
 			}
 		}
 		for (MLCategory mlCategory : categories) {
 			for (String brandString : this.getBrands()) {
 				if (mlCategory.isFor(brandString)) {
 					removed.add(mlCategory);
-					mlCategory.getParent().getChildren_categories()
-							.remove(mlCategory);
+					mlCategory.getParent().getChildren_categories().remove(mlCategory);
 				}
 			}
 		}
 
 		categories.removeAll(removed);
-		System.out.println(this.getClass() + " filtered " + removed.size()
-				+ " categories. Found " + this.getBrands().size()
-				+ " brand strings.");
+		System.out.println(this.getClass() + " filtered " + removed.size() + " categories. Found " + this.getBrands().size() + " brand strings.");
 
 	}
-
-	private void registerBrandStrings(Set<MLCategory> children) {
+	
+	private void registerBrandStrings(Set<MLCategory> children) {	
 		for (MLCategory child : children) {
 			this.getBrands().add(child.getName());
 		}

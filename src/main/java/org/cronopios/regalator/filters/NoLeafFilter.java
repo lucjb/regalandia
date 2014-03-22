@@ -8,13 +8,14 @@ import org.cronopios.regalator.CanonicalCategory;
 public class NoLeafFilter {
 
 	public void filter(Collection<? extends CanonicalCategory> categories) {
-		for (Iterator<? extends CanonicalCategory> iterator = categories
-				.iterator(); iterator.hasNext();) {
+		int i = 0;
+		for (Iterator<? extends CanonicalCategory> iterator = categories.iterator(); iterator.hasNext();) {
 			CanonicalCategory mlCategory = iterator.next();
 			if (!mlCategory.isLeaf()) {
+				i++;
 				iterator.remove();
 			}
 		}
+		System.out.println("NoLeafFilter filtered " + i + " categories.");
 	}
-
 }

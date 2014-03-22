@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.cronopios.regalator.CanonicalCategoryWeighter;
+import org.cronopios.regalator.filters.NoLeafFilter;
+import org.cronopios.regalator.filters.OtrosFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -24,14 +27,11 @@ import com.google.gson.JsonParser;
 
 public class MLCategoryParser {
 
-	private static void exportCategories(List<MLCategory> allMlCategories)
-			throws IOException {
+	private static void exportCategories(List<MLCategory> allMlCategories) throws IOException {
 		Writer fileWriter = new FileWriter(new File("mlcattree.txt"));
 		for (MLCategory mlCategory : allMlCategories) {
 			if (mlCategory.isRoot()) {
-				System.out.println(mlCategory + " "
-						+ mlCategory.getChildren_categories().size() + " "
-						+ mlCategory.getTotal_items_in_this_category());
+				System.out.println(mlCategory + " " + mlCategory.getChildren_categories().size() + " " + mlCategory.getTotal_items_in_this_category());
 				print(mlCategory, fileWriter);
 			}
 		}
@@ -39,24 +39,20 @@ public class MLCategoryParser {
 		fileWriter.close();
 	}
 
-	private static void print(MLCategory mlCategory, Writer writer)
-			throws IOException {
+	private static void print(MLCategory mlCategory, Writer writer) throws IOException {
 		String string = mlCategory.toString();
 		writer.write(string + "\n");
-		Set<MLCategory> children_categories = mlCategory
-				.getChildren_categories();
+		Set<MLCategory> children_categories = mlCategory.getChildren_categories();
 		for (MLCategory child : children_categories) {
 			print(child, writer);
 		}
 
 	}
 
-	public List<MLCategory> parseMLCategories(String fileName)
-			throws FileNotFoundException {
+	public List<MLCategory> parseMLCategories() throws FileNotFoundException {
 
 		List<MLCategory> allMlCategories = Lists.newLinkedList();
-		Reader fileRader = new InputStreamReader(this.getClass()
-				.getResourceAsStream("ml-categories-ar.json"));
+		Reader fileRader = new InputStreamReader(this.getClass().getResourceAsStream("ml-categories-ar.json"));
 		JsonParser parser = new JsonParser();
 		JsonElement root = parser.parse(fileRader);
 		JsonObject rootObject = root.getAsJsonObject();
@@ -68,25 +64,22 @@ public class MLCategoryParser {
 			allMlCategories.add(mlCat);
 		}
 		Map<String, MLCategory> idCat = this.indexCategories(allMlCategories);
-
 		this.populateChildrenAndAncestors(allMlCategories, idCat);
-		this.populateWeights(allMlCategories);
+		Collection<? extends MLCategory> mlCategories = allMlCategories;
+
 		return allMlCategories;
 	}
 
 	private void populateWeights(List<MLCategory> allMlCategories) {
-		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(
-				allMlCategories, 3d / 4d);
+		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(allMlCategories, 3d / 4d);
 		for (MLCategory mlCategory : allMlCategories) {
 			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory));
 		}
 	}
 
-	private void populateChildrenAndAncestors(List<MLCategory> allMlCategories,
-			Map<String, MLCategory> idCat) {
+	private void populateChildrenAndAncestors(List<MLCategory> allMlCategories, Map<String, MLCategory> idCat) {
 		for (MLCategory mlCategory : allMlCategories) {
-			Set<MLCategory> children_categories = mlCategory
-					.getChildren_categories();
+			Set<MLCategory> children_categories = mlCategory.getChildren_categories();
 			Set<MLCategory> childrenWithChildren = Sets.newLinkedHashSet();
 			for (MLCategory child : children_categories) {
 				MLCategory childWithChildren = idCat.get(child.getId());
@@ -104,8 +97,7 @@ public class MLCategoryParser {
 		}
 	}
 
-	private Map<String, MLCategory> indexCategories(
-			List<MLCategory> allMlCategories) {
+	private Map<String, MLCategory> indexCategories(List<MLCategory> allMlCategories) {
 		Map<String, MLCategory> idCat = Maps.newHashMap();
 		for (MLCategory mlCategory : allMlCategories) {
 			idCat.put(mlCategory.getId(), mlCategory);
