@@ -81,30 +81,6 @@ public class InteractiveRegalator {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
 		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories();
 
-		// new CategoryStringFilter("Inmuebles").filter(mlCategories);
-		// new CategoryStringFilter("Servicios", "Profesionales")
-		// .filter(mlCategories);
-		// new CategoryStringFilter("Servicios", "Medicina y Salud")
-		// .filter(mlCategories);
-		// new CategoryStringFilter("Servicios", "Transporte")
-		// .filter(mlCategories);
-
-		new MLVipSubDomainFilter("servicio").filter(mlCategories);
-		new MLVipSubDomainFilter("casa").filter(mlCategories);
-		new MLVipSubDomainFilter("departamento").filter(mlCategories);
-		new MLVipSubDomainFilter("moto").filter(mlCategories);
-		new MLVipSubDomainFilter("serviciotecnico").filter(mlCategories);
-		new MLVipSubDomainFilter("auto").filter(mlCategories);
-		new MLVipSubDomainFilter("profesional").filter(mlCategories);
-		new MLVipSubDomainFilter("inmueble").filter(mlCategories);
-		new MLVipSubDomainFilter("terreno").filter(mlCategories);
-		new MLVipSubDomainFilter("vehiculo").filter(mlCategories);
-
-		new MLNullPictureFilter().filter(mlCategories);
-		new NoLeafFilter().filter(mlCategories);
-		// new FlagBasedBrandFilter().filter(mlCategories);
-		new MLTagsFilter().filter(mlCategories);
-		new OtrosFilter().filter(mlCategories);
 
 		printMLStats(mlCategories);
 		Collection<? extends CanonicalCategory> r = mlCategories;

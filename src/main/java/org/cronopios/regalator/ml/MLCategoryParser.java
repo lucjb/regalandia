@@ -16,6 +16,7 @@ import java.util.Set;
 import org.cronopios.regalator.CanonicalCategoryWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
 import org.cronopios.regalator.filters.OtrosFilter;
+import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -67,6 +68,32 @@ public class MLCategoryParser {
 		this.populateChildrenAndAncestors(allMlCategories, idCat);
 		Collection<? extends MLCategory> mlCategories = allMlCategories;
 
+		// new CategoryStringFilter("Inmuebles").filter(mlCategories);
+		// new CategoryStringFilter("Servicios", "Profesionales")
+		// .filter(mlCategories);
+		// new CategoryStringFilter("Servicios", "Medicina y Salud")
+		// .filter(mlCategories);
+		// new CategoryStringFilter("Servicios", "Transporte")
+		// .filter(mlCategories);
+
+		new MLVipSubDomainFilter("servicio").filter(mlCategories);
+		new MLVipSubDomainFilter("casa").filter(mlCategories);
+		new MLVipSubDomainFilter("departamento").filter(mlCategories);
+		new MLVipSubDomainFilter("moto").filter(mlCategories);
+		new MLVipSubDomainFilter("serviciotecnico").filter(mlCategories);
+		new MLVipSubDomainFilter("auto").filter(mlCategories);
+		new MLVipSubDomainFilter("profesional").filter(mlCategories);
+		new MLVipSubDomainFilter("inmueble").filter(mlCategories);
+		new MLVipSubDomainFilter("terreno").filter(mlCategories);
+		new MLVipSubDomainFilter("vehiculo").filter(mlCategories);
+
+		new MLNullPictureFilter().filter(mlCategories);
+		new MLTagsFilter().filter(mlCategories);
+		new OtrosFilter().filter(mlCategories);
+
+		// new FlagBasedBrandFilter().filter(allMlCategories);
+		this.populateWeights(allMlCategories);
+		new NoLeafFilter().filter(mlCategories);
 		return allMlCategories;
 	}
 
