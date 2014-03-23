@@ -17,7 +17,7 @@ public class CategoryTreeDotExporterMain {
 
 	public static void main(String[] args) throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories();
+		List<MLCategory> allMlCategories = mlCategoryParser.parseMLCategories("ml-categories-ar.json");
 
 		categoriesById = Maps.newLinkedHashMap();
 		Set<MLCategory> roots = Sets.newLinkedHashSet();

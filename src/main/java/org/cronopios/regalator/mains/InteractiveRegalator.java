@@ -79,8 +79,7 @@ public class InteractiveRegalator {
 
 	private static Collection<CanonicalCategory> mercadoLibreTargetCategories() throws FileNotFoundException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories();
-
+		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories("mltest.json");
 
 		printMLStats(mlCategories);
 		Collection<? extends CanonicalCategory> r = mlCategories;

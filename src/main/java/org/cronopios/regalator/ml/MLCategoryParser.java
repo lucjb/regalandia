@@ -16,7 +16,6 @@ import java.util.Set;
 import org.cronopios.regalator.CanonicalCategoryWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
 import org.cronopios.regalator.filters.OtrosFilter;
-import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,10 +49,9 @@ public class MLCategoryParser {
 
 	}
 
-	public List<MLCategory> parseMLCategories() throws FileNotFoundException {
-
+	public List<MLCategory> parseMLCategories(String resourceName) throws FileNotFoundException {
 		List<MLCategory> allMlCategories = Lists.newLinkedList();
-		Reader fileRader = new InputStreamReader(this.getClass().getResourceAsStream("ml-categories-ar.json"));
+		Reader fileRader = new InputStreamReader(this.getClass().getResourceAsStream(resourceName));
 		JsonParser parser = new JsonParser();
 		JsonElement root = parser.parse(fileRader);
 		JsonObject rootObject = root.getAsJsonObject();
