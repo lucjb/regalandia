@@ -6,13 +6,11 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
-public class NeighboursWithinSphereYesNoGiftRecommender<T> extends
-		KNearestSpheresYesNoGiftRecommender<T> {
+public class NeighboursWithinSphereYesNoGiftRecommender<T> extends KNearestSpheresYesNoGiftRecommender<T> {
 
 	private Metric<GiftRecommendation<T>> metric;
 
-	public NeighboursWithinSphereYesNoGiftRecommender(Collection<T> allGifts,
-			Metric<T> metric, GiftWeighter<T> giftWeighter) {
+	public NeighboursWithinSphereYesNoGiftRecommender(Collection<T> allGifts, Metric<T> metric, GiftWeighter<T> giftWeighter) {
 		super(allGifts, metric, giftWeighter);
 		this.setMetric(this.gitRecommendationMetric(metric));
 	}
@@ -23,13 +21,10 @@ public class NeighboursWithinSphereYesNoGiftRecommender<T> extends
 	}
 
 	@Override
-	protected Iterable<GiftRecommendation<T>> neighbourhood(
-			GiftRecommendation<T> giftRecommendation,
-			Set<GiftRecommendation<T>> previousRecommendations) {
+	protected Iterable<GiftRecommendation<T>> neighbourhood(GiftRecommendation<T> giftRecommendation, Set<GiftRecommendation<T>> previousRecommendations) {
 		Collection<GiftRecommendation<T>> neighbourhood = Lists.newArrayList();
 		for (GiftRecommendation<T> prevRecommendation : previousRecommendations) {
-			double distance = this.getMetric().compute(giftRecommendation,
-					prevRecommendation);
+			double distance = this.getMetric().compute(giftRecommendation, prevRecommendation);
 			if (distance < 0.5) {
 				neighbourhood.add(prevRecommendation);
 			}

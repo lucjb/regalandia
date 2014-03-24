@@ -6,7 +6,8 @@ public class MLSettings {
 	private List<String> tags;
 	private String mirror_category;
 	private String vip_subdomain;
-
+	private boolean adult_content;
+	
 	public List<String> getTags() {
 		return tags;
 	}
@@ -29,6 +30,14 @@ public class MLSettings {
 
 	public void setVip_subdomain(String vip_subdomain) {
 		this.vip_subdomain = vip_subdomain;
+	}
+
+	public boolean isAdult_content() {
+		return adult_content;
+	}
+
+	public void setAdult_content(boolean adult_content) {
+		this.adult_content = adult_content;
 	}
 
 }

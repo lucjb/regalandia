@@ -16,6 +16,7 @@ import java.util.Set;
 import org.cronopios.regalator.CanonicalCategoryWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
 import org.cronopios.regalator.filters.OtrosFilter;
+import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -89,14 +90,14 @@ public class MLCategoryParser {
 		new MLTagsFilter().filter(mlCategories);
 		new OtrosFilter().filter(mlCategories);
 
-		// new FlagBasedBrandFilter().filter(allMlCategories);
+		new FlagBasedBrandFilter().filter(allMlCategories);
 		this.populateWeights(allMlCategories);
 		new NoLeafFilter().filter(mlCategories);
 		return allMlCategories;
 	}
 
 	private void populateWeights(List<MLCategory> allMlCategories) {
-		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(allMlCategories, 3d / 4d);
+		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(allMlCategories, 1d);
 		for (MLCategory mlCategory : allMlCategories) {
 			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory));
 		}

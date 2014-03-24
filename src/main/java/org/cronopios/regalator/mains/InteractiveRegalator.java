@@ -17,14 +17,10 @@ import org.cronopios.regalator.KNearestSpheresYesNoGiftRecommender;
 import org.cronopios.regalator.NeighboursWithinSphereYesNoGiftRecommender;
 import org.cronopios.regalator.WeightableWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
-import org.cronopios.regalator.filters.OtrosFilter;
 import org.cronopios.regalator.icecat.IceCatCategory;
 import org.cronopios.regalator.icecat.IceCatParser;
 import org.cronopios.regalator.ml.MLCategory;
 import org.cronopios.regalator.ml.MLCategoryParser;
-import org.cronopios.regalator.ml.MLNullPictureFilter;
-import org.cronopios.regalator.ml.MLTagsFilter;
-import org.cronopios.regalator.ml.MLVipSubDomainFilter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -79,7 +75,9 @@ public class InteractiveRegalator {
 
 	private static Collection<CanonicalCategory> mercadoLibreTargetCategories() throws FileNotFoundException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
-		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories("mltest.json");
+		// List<MLCategory> mlCategories =
+		// mlCategoryParser.parseMLCategories("mltest.json");
+		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories("ml-categories-ar.json");
 
 		printMLStats(mlCategories);
 		Collection<? extends CanonicalCategory> r = mlCategories;

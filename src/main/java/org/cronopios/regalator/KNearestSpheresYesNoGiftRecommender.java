@@ -6,13 +6,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.apache.commons.math3.stat.Frequency;
+
+import com.google.common.cache.AbstractCache.StatsCounter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class KNearestSpheresYesNoGiftRecommender<T> implements
-		GiftRecommender<T> {
+public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T> {
 
 	private Random random = new Random();
 	private KNNRetriever<GiftRecommendation<T>> knnRetriever;
@@ -20,57 +22,50 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements
 	private Map<GiftRecommendation<T>, Iterable<GiftRecommendation<T>>> kNearestSpheres;
 	private GiftWeighter<T> giftWeighter;
 
-	public KNearestSpheresYesNoGiftRecommender(Collection<T> allGifts,
-			final Metric<T> metric, GiftWeighter<T> giftWeighter) {
+	public KNearestSpheresYesNoGiftRecommender(Collection<T> allGifts, final Metric<T> metric, GiftWeighter<T> giftWeighter) {
 		Collection<GiftRecommendation<T>> space = Lists.newArrayList();
 		for (T gift : allGifts) {
-			GiftRecommendation<T> giftRecommendation = new GiftRecommendation<T>(
-					gift, -1d);
+			GiftRecommendation<T> giftRecommendation = new GiftRecommendation<T>(gift, -1d);
 			space.add(giftRecommendation);
 		}
 		this.setSpace(space);
 		this.setGiftWeighter(giftWeighter);
-		this.setKnnRetriever(new MetricBasedFullScanKNNRetriever<GiftRecommendation<T>>(
-				space, this.gitRecommendationMetric(metric)));
+		this.setKnnRetriever(new MetricBasedFullScanKNNRetriever<GiftRecommendation<T>>(space, this.gitRecommendationMetric(metric)));
 
 		this.setkNearestSpheres(this.indexNeighbourhood());
 		System.out.println("K nearest spheres cached.");
 	}
 
-	protected Metric<GiftRecommendation<T>> gitRecommendationMetric(
-			final Metric<T> metric) {
+	protected Metric<GiftRecommendation<T>> gitRecommendationMetric(final Metric<T> metric) {
 		return new Metric<GiftRecommendation<T>>() {
 
 			@Override
-			public double compute(GiftRecommendation<T> x,
-					GiftRecommendation<T> y) {
+			public double compute(GiftRecommendation<T> x, GiftRecommendation<T> y) {
 				return metric.compute(x.getGift(), y.getGift());
 			}
 		};
 	}
 
 	@Override
-	public Set<GiftRecommendation<T>> recommend(
-			Set<GiftRecommendation<T>> previousRecommendations, int n) {
+	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
 
 		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
 			giftRecommendation.setRecommenderScore(0d);
 		}
-
+		Frequency f = new Frequency();
 		for (GiftRecommendation<T> giftRecommendation : this.getSpace()) {
 			if (giftRecommendation.getUserScore() == null) {
-				this.computeRecommenderScore(giftRecommendation,
-						previousRecommendations);
+				double neighboursCount = this.computeRecommenderScore(giftRecommendation, previousRecommendations);
+				f.addValue(neighboursCount);
 			}
 		}
+		System.out.println(f);
 		this.normalizeRecommenderScore();
 
 		return this.drawRecommendations(n, this.makeGiftDistribution());
 	}
 
-	private Set<GiftRecommendation<T>> drawRecommendations(
-			int n,
-			SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>> probabilityDistribution) {
+	private Set<GiftRecommendation<T>> drawRecommendations(int n, SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>> probabilityDistribution) {
 		Set<GiftRecommendation<T>> out = Sets.newHashSet();
 		for (int i = 0; i < n; i++) {
 			GiftRecommendation<T> next = probabilityDistribution.next();
@@ -86,18 +81,14 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements
 		for (GiftRecommendation<T> giftPoint : points) {
 			pmf.put(giftPoint, giftPoint.getRecommenderScore());
 		}
-		SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>> probabilityDistribution = new SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>>(
-				pmf, this.getRandom());
+		SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>> probabilityDistribution = new SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>>(pmf, this.getRandom());
 
 		return probabilityDistribution;
 
 	}
 
-	protected void computeRecommenderScore(
-			GiftRecommendation<T> giftRecommendation,
-			Set<GiftRecommendation<T>> previousRecommendations) {
-		Iterable<GiftRecommendation<T>> neighbours = this.neighbourhood(
-				giftRecommendation, previousRecommendations);
+	protected double computeRecommenderScore(GiftRecommendation<T> giftRecommendation, Set<GiftRecommendation<T>> previousRecommendations) {
+		Iterable<GiftRecommendation<T>> neighbours = this.neighbourhood(giftRecommendation, previousRecommendations);
 		double yesCount = 0;
 		double dontKnowCount = 0;
 		double total = 0;
@@ -114,16 +105,13 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements
 		if (total == dontKnowCount) {
 			recommenderScore = 1d / this.getSpace().size();
 		}
-		recommenderScore = recommenderScore
-				* this.getGiftWeighter().weight(giftRecommendation.getGift());
+		recommenderScore = recommenderScore * this.getGiftWeighter().weight(giftRecommendation.getGift());
 		giftRecommendation.setRecommenderScore(recommenderScore);
+		return total;
 	}
 
-	protected Iterable<GiftRecommendation<T>> neighbourhood(
-			GiftRecommendation<T> giftRecommendation,
-			Set<GiftRecommendation<T>> previousRecommendations) {
-		Iterable<GiftRecommendation<T>> neighbours = this.getkNearestSpheres()
-				.get(giftRecommendation);
+	protected Iterable<GiftRecommendation<T>> neighbourhood(GiftRecommendation<T> giftRecommendation, Set<GiftRecommendation<T>> previousRecommendations) {
+		Iterable<GiftRecommendation<T>> neighbours = this.getkNearestSpheres().get(giftRecommendation);
 		return neighbours;
 	}
 
@@ -137,8 +125,7 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements
 			n++;
 		}
 		for (GiftRecommendation<T> giftRecommendation : this.getSpace()) {
-			double recommenderScore = giftRecommendation.getRecommenderScore()
-					/ totalScore;
+			double recommenderScore = giftRecommendation.getRecommenderScore() / totalScore;
 
 			if (totalScore == 0) {
 				recommenderScore = 1d / n;
@@ -151,20 +138,18 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements
 	}
 
 	protected Map<GiftRecommendation<T>, Iterable<GiftRecommendation<T>>> indexNeighbourhood() {
-		Map<GiftRecommendation<T>, Iterable<GiftRecommendation<T>>> neighbourhood = Maps
-				.newLinkedHashMap();
+		Frequency f = new Frequency();
+		Map<GiftRecommendation<T>, Iterable<GiftRecommendation<T>>> neighbourhood = Maps.newLinkedHashMap();
 		for (GiftRecommendation<T> giftRecommendation : this.getSpace()) {
-			SortedMap<Double, Collection<GiftRecommendation<T>>> kNearestSpheres = this
-					.getKnnRetriever().retrieveKNearestSpheres(
-							giftRecommendation, 2);
+			SortedMap<Double, Collection<GiftRecommendation<T>>> kNearestSpheres = this.getKnnRetriever().retrieveKNearestSpheres(giftRecommendation, 3);
 
-			Collection<Collection<GiftRecommendation<T>>> spheres = kNearestSpheres
-					.values();
-			Iterable<GiftRecommendation<T>> neighbours = Iterables
-					.concat(spheres);
+			Collection<Collection<GiftRecommendation<T>>> spheres = kNearestSpheres.values();
+			Iterable<GiftRecommendation<T>> neighbours = Iterables.concat(spheres);
 
 			neighbourhood.put(giftRecommendation, neighbours);
+			f.addValue(Iterables.size(neighbours));
 		}
+		System.out.println("negih" + f);
 		return neighbourhood;
 	}
 
@@ -188,8 +173,7 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements
 		return kNearestSpheres;
 	}
 
-	public void setkNearestSpheres(
-			Map<GiftRecommendation<T>, Iterable<GiftRecommendation<T>>> kNearestSpheres) {
+	public void setkNearestSpheres(Map<GiftRecommendation<T>, Iterable<GiftRecommendation<T>>> kNearestSpheres) {
 		this.kNearestSpheres = kNearestSpheres;
 	}
 
