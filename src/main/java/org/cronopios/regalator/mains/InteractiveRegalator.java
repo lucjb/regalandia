@@ -71,11 +71,11 @@ public class InteractiveRegalator {
 		}
 	}
 
-	private static Collection<CanonicalCategory> iceCategories() throws FileNotFoundException {
-		Collection<? extends IceCatCategory> iceCategories = new IceCatParser().parse();
-		new NoLeafFilter().filter(iceCategories);
-		return (Collection<CanonicalCategory>) iceCategories;
-	}
+//	private static Collection<CanonicalCategory> iceCategories() throws FileNotFoundException {
+//		Collection<? extends IceCatCategory> iceCategories = new IceCatParser().parse();
+//		new NoLeafFilter().filter(iceCategories);
+//		return (Collection<CanonicalCategory>) iceCategories;
+//	}
 
 	private static Collection<CanonicalCategory> mercadoLibreTargetCategories() throws FileNotFoundException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
