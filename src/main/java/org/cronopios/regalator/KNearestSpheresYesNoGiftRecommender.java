@@ -47,7 +47,7 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 
 	@Override
 	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
-
+		System.out.println("previousRecommendations: " + +previousRecommendations.size());
 		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
 			giftRecommendation.setRecommenderScore(0d);
 		}
@@ -66,7 +66,7 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 
 	private Set<GiftRecommendation<T>> drawRecommendations(int n, SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>> probabilityDistribution) {
 		Set<GiftRecommendation<T>> out = Sets.newHashSet();
-		for (int i = 0; i < n; i++) {
+		while (out.size() < n) {
 			GiftRecommendation<T> next = probabilityDistribution.next();
 			out.add(next);
 		}
