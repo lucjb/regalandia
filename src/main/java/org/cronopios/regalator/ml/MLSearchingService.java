@@ -53,8 +53,9 @@ public class MLSearchingService implements GiftItemSearchingService {
 
 	private String queryStringForCategory(CanonicalCategory category) {
 		StringBuffer buffer = new StringBuffer();
-		for (CanonicalCategory node : category.getPathFromRoot()) {
-			buffer.append(node.getName() + " ");
+		buffer.append(category.getName());
+		if (!category.isRoot()) {
+			buffer.append(" " + category.getParent().getName());
 		}
 		String queryString = buffer.toString().trim();
 		return queryString;
