@@ -3,8 +3,9 @@ package org.cronopios.regalator.ml;
 import java.net.URL;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.cronopios.regalator.GiftItem;
 
-public class MLItem {
+public class MLItem implements GiftItem {
 
 	private String id;
 	private String title;
@@ -73,6 +74,11 @@ public class MLItem {
 
 	public void setThumbnail(URL thumbnail) {
 		this.thumbnail = thumbnail;
+	}
+
+	@Override
+	public String getImage() {
+		return this.getThumbnail().toExternalForm();
 	}
 
 }

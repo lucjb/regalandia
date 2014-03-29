@@ -7,5 +7,6 @@ public interface Gift {
 	public String getTitle();
 
 	public String getImageURL();
+	
 
 }

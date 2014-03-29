@@ -65,15 +65,11 @@ public class MLCategoryParser {
 		}
 		Map<String, MLCategory> idCat = this.indexCategories(allMlCategories);
 		this.populateChildrenAndAncestors(allMlCategories, idCat);
-		Collection<? extends MLCategory> mlCategories = allMlCategories;
+		return allMlCategories;
+	}
 
-		// new CategoryStringFilter("Inmuebles").filter(mlCategories);
-		// new CategoryStringFilter("Servicios", "Profesionales")
-		// .filter(mlCategories);
-		// new CategoryStringFilter("Servicios", "Medicina y Salud")
-		// .filter(mlCategories);
-		// new CategoryStringFilter("Servicios", "Transporte")
-		// .filter(mlCategories);
+	public void filterAndWeight(List<MLCategory> allMlCategories) {
+		Collection<? extends MLCategory> mlCategories = allMlCategories;
 
 		new MLVipSubDomainFilter("servicio").filter(mlCategories);
 		new MLVipSubDomainFilter("casa").filter(mlCategories);
@@ -93,7 +89,6 @@ public class MLCategoryParser {
 		new FlagBasedBrandFilter().filter(allMlCategories);
 		this.populateWeights(allMlCategories);
 		new NoLeafFilter().filter(mlCategories);
-		return allMlCategories;
 	}
 
 	private void populateWeights(List<MLCategory> allMlCategories) {
@@ -129,5 +124,9 @@ public class MLCategoryParser {
 			idCat.put(mlCategory.getId(), mlCategory);
 		}
 		return idCat;
+	}
+
+	public List<MLCategory> parseMLCategories() throws FileNotFoundException {
+		return this.parseMLCategories("ml-categories-ar.json");
 	}
 }
