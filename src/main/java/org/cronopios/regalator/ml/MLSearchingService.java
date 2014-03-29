@@ -1,6 +1,8 @@
 package org.cronopios.regalator.ml;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
@@ -8,6 +10,7 @@ import org.cronopios.regalator.CanonicalCategory;
 import org.cronopios.regalator.GiftItem;
 import org.cronopios.regalator.GiftItemSearchingService;
 
+import com.google.common.collect.Ordering;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -37,10 +40,33 @@ public class MLSearchingService implements GiftItemSearchingService {
 		return mlResultsList;
 	}
 
+	@Override
 	public List<? extends GiftItem> search(CanonicalCategory category) {
-		String queryString = this.queryStringForCategory(category);
 		try {
-			return this.search(queryString).getResults();
+			MLResultsList search = this.searchCategory(category);
+			List<MLItem> results = search.getResults();
+			Ordering<MLItem> ordering = Ordering.from(new Comparator<MLItem>() {
+				@Override
+				public int compare(MLItem x, MLItem y) {
+					if (x.getCondition().equals("new") && !y.getCondition().equals("new")) {
+						return -1;
+					}
+					if (y.getCondition().equals("new") && !x.getCondition().equals("new")) {
+						return 1;
+					}
+
+					if (x.getListing_type_id().equals("gold") && !y.getListing_type_id().equals("gold")) {
+						return -1;
+					}
+					if (y.getListing_type_id().equals("gold") && !x.getListing_type_id().equals("gold")) {
+						return 1;
+					}
+
+					return 0;
+				}
+			});
+			Collections.sort(results, ordering);
+			return results;
 		} catch (MeliException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,16 +75,6 @@ public class MLSearchingService implements GiftItemSearchingService {
 			e.printStackTrace();
 		}
 		return ListUtils.EMPTY_LIST;
-	}
-
-	private String queryStringForCategory(CanonicalCategory category) {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(category.getName());
-		if (!category.isRoot()) {
-			buffer.append(" " + category.getParent().getName());
-		}
-		String queryString = buffer.toString().trim();
-		return queryString;
 	}
 
 	public Meli getMeli() {
@@ -77,8 +93,15 @@ public class MLSearchingService implements GiftItemSearchingService {
 		this.parser = parser;
 	}
 
-	public MLResultsList searchCategory(MLCategory mlCategory) throws MeliException, IOException {
-		String queryString = this.queryStringForCategory(mlCategory);
-		return this.search(queryString);
+	public MLResultsList searchCategory(CanonicalCategory category) throws MeliException, IOException {
+		FluentStringsMap params = new FluentStringsMap();
+		params.add("category", category.getId());
+		Response response = this.getMeli().get("/sites/MLA/search", params);
+		String responseBody = response.getResponseBody();
+		JsonElement root = this.getParser().parse(responseBody);
+		JsonObject rootObject = root.getAsJsonObject();
+		Gson gson = new Gson();
+		MLResultsList mlResultsList = gson.fromJson(rootObject, MLResultsList.class);
+		return mlResultsList;
 	}
 }

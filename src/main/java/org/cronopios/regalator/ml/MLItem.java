@@ -1,7 +1,5 @@
 package org.cronopios.regalator.ml;
 
-import java.net.URL;
-
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.cronopios.regalator.GiftItem;
 
@@ -15,6 +13,8 @@ public class MLItem implements GiftItem {
 	private int sold_quantity;
 	private String thumbnail;
 	private String permalink;
+	private String condition;
+	private String listing_type_id;
 
 	@Override
 	public String toString() {
@@ -93,6 +93,22 @@ public class MLItem implements GiftItem {
 
 	public void setPermalink(String permalink) {
 		this.permalink = permalink;
+	}
+
+	public String getListing_type_id() {
+		return listing_type_id;
+	}
+
+	public void setListing_type_id(String listing_type_id) {
+		this.listing_type_id = listing_type_id;
+	}
+
+	public String getCondition() {
+		return condition;
+	}
+
+	public void setCondition(String condition) {
+		this.condition = condition;
 	}
 
 }

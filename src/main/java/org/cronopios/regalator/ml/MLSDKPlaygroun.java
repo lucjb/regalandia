@@ -1,10 +1,10 @@
 package org.cronopios.regalator.ml;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
 
@@ -13,16 +13,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.commons.lang3.RandomStringUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.mercadolibre.sdk.Meli;
 import com.mercadolibre.sdk.MeliException;
-import com.ning.http.client.FluentStringsMap;
-import com.ning.http.client.Response;
 
 public class MLSDKPlaygroun {
 
@@ -52,7 +43,7 @@ public class MLSDKPlaygroun {
 		System.out.println(mlCategory);
 		MLResultsList mlResultsList = new MLSearchingService().searchCategory(mlCategory);
 		List<MLItem> results = mlResultsList.getResults();
-		
+
 		showImages(results);
 	}
 
@@ -68,7 +59,7 @@ public class MLSDKPlaygroun {
 		for (MLItem mlItem : results) {
 			if (i > 100)
 				break;
-			BufferedImage image = ImageIO.read(mlItem.getThumbnail());
+			BufferedImage image = ImageIO.read(new URL(mlItem.getThumbnail()));
 			JLabel label = new JLabel(new ImageIcon(image));
 			f.getContentPane().setLayout(new FlowLayout(FlowLayout.LEFT));
 			f.getContentPane().add(label);

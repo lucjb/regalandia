@@ -8,7 +8,6 @@ import java.util.SortedMap;
 
 import org.apache.commons.math3.stat.Frequency;
 
-import com.google.common.cache.AbstractCache.StatsCounter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

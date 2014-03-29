@@ -25,7 +25,7 @@ public class NeighboursWithinSphereYesNoGiftRecommender<T> extends KNearestSpher
 		Collection<GiftRecommendation<T>> neighbourhood = Lists.newArrayList();
 		for (GiftRecommendation<T> prevRecommendation : previousRecommendations) {
 			double distance = this.getMetric().compute(giftRecommendation, prevRecommendation);
-			if (distance < 0.5) {
+			if (distance < 0.6) {
 				neighbourhood.add(prevRecommendation);
 			}
 
