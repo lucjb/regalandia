@@ -6,4 +6,6 @@ public interface GiftItem {
 
 	public String getImage();
 
+	public String getExternalURL();
+
 }
