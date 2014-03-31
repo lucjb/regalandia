@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.collections.ListUtils;
 import org.cronopios.regalator.CanonicalCategory;
 import org.cronopios.regalator.GiftItem;
 import org.cronopios.regalator.GiftItemSearchingService;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -23,6 +25,7 @@ import com.ning.http.client.Response;
 public class MLSearchingService implements GiftItemSearchingService {
 	private Meli meli = new Meli((Integer) 0, "");
 	private JsonParser parser = new JsonParser();
+	private Random random = new Random(0);
 
 	public MLSearchingService() {
 	}
@@ -45,6 +48,11 @@ public class MLSearchingService implements GiftItemSearchingService {
 		try {
 			MLResultsList search = this.searchCategory(category);
 			List<MLItem> results = search.getResults();
+			while (results.isEmpty() && !category.isRoot()) {
+				search = this.searchCategory(category.getParent());
+				results = search.getResults();
+				category = category.getParent();
+			}
 			Ordering<MLItem> ordering = Ordering.from(new Comparator<MLItem>() {
 				@Override
 				public int compare(MLItem x, MLItem y) {
@@ -65,8 +73,10 @@ public class MLSearchingService implements GiftItemSearchingService {
 					return 0;
 				}
 			});
-			Collections.sort(results, ordering);
-			return results;
+			// Collections.sort(results, ordering);
+			MLItem mlItem = results.get(random.nextInt(results.size()));
+
+			return Lists.newArrayList(mlItem);
 		} catch (MeliException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

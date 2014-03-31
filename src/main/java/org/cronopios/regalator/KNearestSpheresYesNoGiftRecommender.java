@@ -49,7 +49,8 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
 		System.out.println("previousRecommendations: " + +previousRecommendations.size());
 		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
-			giftRecommendation.setRecommenderScore(0d);
+			double weight = this.getGiftWeighter().weight(giftRecommendation.getGift());
+			giftRecommendation.setRecommenderScore(weight / this.getSpace().size());
 		}
 		Frequency f = new Frequency();
 		for (GiftRecommendation<T> giftRecommendation : this.getSpace()) {
@@ -89,6 +90,7 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 	protected double computeRecommenderScore(GiftRecommendation<T> giftRecommendation, Set<GiftRecommendation<T>> previousRecommendations) {
 		Iterable<GiftRecommendation<T>> neighbours = this.neighbourhood(giftRecommendation, previousRecommendations);
 		double yesCount = 0;
+		double noCount = 0;
 		double dontKnowCount = 0;
 		double total = 0;
 
@@ -97,14 +99,20 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 				dontKnowCount++;
 			} else if (neighbour.getUserScore() > 0.5) {
 				yesCount++;
+			} else {
+				noCount++;
 			}
 			total++;
 		}
-		double recommenderScore = yesCount / (total);
+		double weight = this.getGiftWeighter().weight(giftRecommendation.getGift());
+		double recommenderScore = giftRecommendation.getRecommenderScore();
 		if (total == dontKnowCount) {
-			recommenderScore = 1d / this.getSpace().size();
+			recommenderScore = 1d / this.getSpace().size() * weight;
+		} else if (yesCount > (yesCount + noCount) / 2d) {
+			recommenderScore = giftRecommendation.getRecommenderScore() * 10d * weight;
+		} else if (noCount > (yesCount + noCount) / 2d) {
+			recommenderScore = giftRecommendation.getRecommenderScore() * 0.1 * weight;
 		}
-		recommenderScore = recommenderScore * this.getGiftWeighter().weight(giftRecommendation.getGift());
 		giftRecommendation.setRecommenderScore(recommenderScore);
 		return total;
 	}

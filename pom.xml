@@ -13,7 +13,7 @@
 	<repositories>
 		<repository>
 			<id>mercadolibre-snapshots</id>
-			<url>https://github.com/mercadolibre/java-sdk-repo/raw/master/snapshots</url>
+			<url>http://github.com/mercadolibre/java-sdk-repo/raw/master/snapshots</url>
 		</repository>
 	</repositories>
 	<dependencies>
