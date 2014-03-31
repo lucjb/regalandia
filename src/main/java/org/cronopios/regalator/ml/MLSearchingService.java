@@ -74,8 +74,10 @@ public class MLSearchingService implements GiftItemSearchingService {
 				}
 			});
 			// Collections.sort(results, ordering);
+			if (results.isEmpty())
+				return ListUtils.EMPTY_LIST;
 			MLItem mlItem = results.get(random.nextInt(results.size()));
-
+			System.out.println("gift item drawn");
 			return Lists.newArrayList(mlItem);
 		} catch (MeliException e) {
 			// TODO Auto-generated catch block
