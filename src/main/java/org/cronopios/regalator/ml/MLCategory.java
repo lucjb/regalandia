@@ -5,9 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.ListUtils;
 import org.cronopios.regalator.AbstractCanonicalCategory;
 import org.cronopios.regalator.CanonicalCategory;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class MLCategory extends AbstractCanonicalCategory {
@@ -17,6 +19,12 @@ public class MLCategory extends AbstractCanonicalCategory {
 	private int total_items_in_this_category;
 	private String picture;
 	private MLSettings settings;
+	private List<String> regalableItems = ListUtils.EMPTY_LIST;
+
+	@Override
+	public String toString() {
+		return super.toString() + " regalables: " + this.getRegalableItems().size();
+	}
 
 	public List<MLCategory> getPath_from_root() {
 		return path_from_root;
@@ -103,6 +111,14 @@ public class MLCategory extends AbstractCanonicalCategory {
 
 	public void setAncestorsPicture(String ancestorsPicture) {
 		this.ancestorsPicture = ancestorsPicture;
+	}
+
+	public List<String> getRegalableItems() {
+		return regalableItems;
+	}
+
+	public void setRegalableItems(List<String> regalableItems) {
+		this.regalableItems = regalableItems;
 	}
 
 }

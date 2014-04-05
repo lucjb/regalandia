@@ -108,6 +108,9 @@ public class MLSearchingService implements GiftItemSearchingService {
 	public MLResultsList searchCategory(CanonicalCategory category) throws MeliException, IOException {
 		FluentStringsMap params = new FluentStringsMap();
 		params.add("category", category.getId());
+		params.add("condition", "new");
+		params.add("limit", "200");
+		params.add("power_seller", "true");
 		Response response = this.getMeli().get("/sites/MLA/search", params);
 		String responseBody = response.getResponseBody();
 		JsonElement root = this.getParser().parse(responseBody);

@@ -1,5 +1,6 @@
 package org.cronopios.regalator.ml;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -15,7 +16,6 @@ import java.util.Set;
 
 import org.cronopios.regalator.CanonicalCategoryWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
-import org.cronopios.regalator.filters.OtrosFilter;
 import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 
 import com.google.common.collect.Lists;
@@ -50,7 +50,7 @@ public class MLCategoryParser {
 
 	}
 
-	public List<MLCategory> parseMLCategories(String resourceName) throws FileNotFoundException {
+	public List<MLCategory> parseMLCategories(String resourceName) throws IOException {
 		List<MLCategory> allMlCategories = Lists.newLinkedList();
 		Reader fileRader = new InputStreamReader(this.getClass().getResourceAsStream(resourceName));
 		JsonParser parser = new JsonParser();
@@ -64,8 +64,38 @@ public class MLCategoryParser {
 			allMlCategories.add(mlCat);
 		}
 		Map<String, MLCategory> idCat = this.indexCategories(allMlCategories);
+		this.populateRegalableItems(idCat);
 		this.populateChildrenAndAncestors(allMlCategories, idCat);
+		System.out.println("Parsed " + allMlCategories.size() + " ML  categories.");
 		return allMlCategories;
+	}
+
+	private void populateRegalableItems(Map<String, MLCategory> idCat) throws IOException {
+		BufferedReader r = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("catsItems.csv")));
+		String line = null;
+		int leaves = 0;
+		int noLeaves = 0;
+		while ((line = r.readLine()) != null) {
+			String[] fields = line.split(", *| +");
+			String catId = fields[0];
+			List<String> itemIds = Lists.newArrayList();
+			for (int i = 1; i < fields.length; i++) {
+				itemIds.add(fields[i]);
+			}
+			MLCategory mlCategory = idCat.get(catId);
+			if (mlCategory == null) {
+				System.out.println("Unknown category: " + catId);
+			} else {
+				mlCategory.setRegalableItems(itemIds);
+				if (mlCategory.isLeaf()) {
+					leaves++;
+				} else {
+					noLeaves++;
+				}
+			}
+		}
+		r.close();
+		System.out.println("Regalable categories: " + (leaves + noLeaves) + ", leaves: " + leaves + ", no leaves: " + noLeaves);
 	}
 
 	public void filterAndWeight(List<MLCategory> allMlCategories) {
@@ -82,19 +112,20 @@ public class MLCategoryParser {
 		new MLVipSubDomainFilter("terreno").filter(mlCategories);
 		new MLVipSubDomainFilter("vehiculo").filter(mlCategories);
 
-		new MLNullPictureFilter().filter(mlCategories);
-		new MLTagsFilter().filter(mlCategories);
-		new OtrosFilter().filter(mlCategories);
+		// new MLTagsFilter().filter(mlCategories);
+		// new OtrosFilter().filter(mlCategories);
 
 		new FlagBasedBrandFilter().filter(allMlCategories);
 		this.populateWeights(allMlCategories);
 		new NoLeafFilter().filter(mlCategories);
+		System.out.println("ML Candidate categories: " + mlCategories.size());
 	}
 
 	private void populateWeights(List<MLCategory> allMlCategories) {
 		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(allMlCategories, 1d);
 		for (MLCategory mlCategory : allMlCategories) {
-			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory));
+			int size = mlCategory.getRegalableItems().size();
+			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory) * size == 0 ? 1 : size * 10);
 		}
 	}
 
@@ -126,7 +157,7 @@ public class MLCategoryParser {
 		return idCat;
 	}
 
-	public List<MLCategory> parseMLCategories() throws FileNotFoundException {
+	public List<MLCategory> parseMLCategories() throws IOException {
 		return this.parseMLCategories("ml-categories-ar.json");
 	}
 }
