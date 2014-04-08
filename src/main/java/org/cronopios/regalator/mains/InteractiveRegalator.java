@@ -1,7 +1,6 @@
 package org.cronopios.regalator.mains;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
@@ -72,14 +71,14 @@ public class InteractiveRegalator {
 	// return (Collection<CanonicalCategory>) iceCategories;
 	// }
 
-	private static Collection<CanonicalCategory> mercadoLibreTargetCategories() throws FileNotFoundException {
+	private static Collection<CanonicalCategory> mercadoLibreTargetCategories() throws IOException {
 		MLCategoryParser mlCategoryParser = new MLCategoryParser();
 		// List<MLCategory> mlCategories =
 		// mlCategoryParser.parseMLCategories("mltest.json");
-		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories("ml-categories-ar.json");
+		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories();
+
 		mlCategoryParser.filterAndWeight(mlCategories);
 		Collection<? extends CanonicalCategory> r = mlCategories;
 		return (Collection<CanonicalCategory>) r;
 	}
-
 }

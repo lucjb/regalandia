@@ -8,6 +8,8 @@ public class MLResultsList {
 
 	private List<MLItem> results;
 
+	private MLPaging paging;
+
 	public List<MLItem> getResults() {
 		return results;
 	}
@@ -19,6 +21,14 @@ public class MLResultsList {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public MLPaging getPaging() {
+		return paging;
+	}
+
+	public void setPaging(MLPaging paging) {
+		this.paging = paging;
 	}
 
 }

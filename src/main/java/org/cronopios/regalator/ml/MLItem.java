@@ -15,6 +15,7 @@ public class MLItem implements GiftItem {
 	private String permalink;
 	private String condition;
 	private String listing_type_id;
+	private String category_id;
 
 	@Override
 	public String toString() {
@@ -109,6 +110,14 @@ public class MLItem implements GiftItem {
 
 	public void setCondition(String condition) {
 		this.condition = condition;
+	}
+
+	public String getCategory_id() {
+		return category_id;
+	}
+
+	public void setCategory_id(String category_id) {
+		this.category_id = category_id;
 	}
 
 }
