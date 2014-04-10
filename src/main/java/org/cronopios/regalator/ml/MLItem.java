@@ -1,5 +1,7 @@
 package org.cronopios.regalator.ml;
 
+import java.util.List;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.cronopios.regalator.GiftItem;
 
@@ -16,6 +18,7 @@ public class MLItem implements GiftItem {
 	private String condition;
 	private String listing_type_id;
 	private String category_id;
+	private List<MLPicture> pictures;
 
 	@Override
 	public String toString() {
@@ -72,7 +75,11 @@ public class MLItem implements GiftItem {
 
 	@Override
 	public String getImage() {
-		return this.getThumbnail();
+		if (this.getPictures().isEmpty()) {
+			return this.getThumbnail();
+		} else {
+			return this.getPictures().get(0).getUrl();
+		}
 	}
 
 	@Override
@@ -118,6 +125,14 @@ public class MLItem implements GiftItem {
 
 	public void setCategory_id(String category_id) {
 		this.category_id = category_id;
+	}
+
+	public List<MLPicture> getPictures() {
+		return pictures;
+	}
+
+	public void setPictures(List<MLPicture> pictures) {
+		this.pictures = pictures;
 	}
 
 }
