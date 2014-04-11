@@ -36,9 +36,16 @@ public class MLSDKPlaygroun {
 
 		Meli meli = new Meli((Integer) 0, "");
 
-		int[] sellerIds = new int[] { 15280737, 47316577, 77065824, 131662738, 12811571, 140948195, 24882862, 95680760, 83918312, 3255473, 35370149, 39144101, 51810624, 76301487, 53059479, 153418288, 95337832, 86110765, 127176707, 97562082, 47442520, 55101916, 54310549,
-				82564432, 171023, 90062782, 21884494, 27138001, 96372774, 110242209, 42932597, 78714086, 26321374, 74609318, 52791362, 22004047, 59408460, 54951059, 18596327 };
-//		int[] sellerIds = new int[] { 27138001, 96372774 };
+		int[] sellerIds = new int[] { 29591208, 5157944, 14648404, 148645467,
+				135125616, 59231372, 304925, 54295232, 203079, 77852900,
+				15280737, 47316577, 77065824, 131662738, 12811571, 140948195,
+				24882862, 95680760, 83918312, 3255473, 35370149, 39144101,
+				51810624, 76301487, 53059479, 153418288, 95337832, 86110765,
+				127176707, 97562082, 47442520, 55101916, 54310549, 82564432,
+				171023, 90062782, 21884494, 27138001, 96372774, 110242209,
+				42932597, 78714086, 26321374, 74609318, 52791362, 22004047,
+				59408460, 54951059, 18596327 };
+		// int[] sellerIds = new int[] { 27138001, 96372774 };
 
 		JsonParser parser = new JsonParser();
 		Gson gson = new Gson();
@@ -67,7 +74,8 @@ public class MLSDKPlaygroun {
 				catArts.put(item.getCategory_id(), id);
 			}
 		}
-		BufferedWriter out = new BufferedWriter(new FileWriter(new File("catsItems.csv")));
+		BufferedWriter out = new BufferedWriter(new FileWriter(new File(
+				"catsItems.csv")));
 		Set<String> keySet = catArts.keySet();
 		for (String catId : keySet) {
 			StringBuffer line = new StringBuffer();
@@ -83,10 +91,13 @@ public class MLSDKPlaygroun {
 		out.flush();
 		out.close();
 
-		System.out.println(catArts.values().size() + " items in " + catArts.keySet().size() + " categories from " + sellerIds.length + " sellers.");
+		System.out.println(catArts.values().size() + " items in "
+				+ catArts.keySet().size() + " categories from "
+				+ sellerIds.length + " sellers.");
 	}
 
-	private static MLResultsList fetch(Meli meli, JsonParser parser, Gson gson, String sellerId, int offset) throws MeliException, IOException {
+	private static MLResultsList fetch(Meli meli, JsonParser parser, Gson gson,
+			String sellerId, int offset) throws MeliException, IOException {
 		FluentStringsMap params = new FluentStringsMap();
 		params.add("seller_id", sellerId);
 		params.add("limit", "200");
@@ -97,7 +108,8 @@ public class MLSDKPlaygroun {
 
 		JsonElement root = parser.parse(responseBody);
 		JsonObject rootObject = root.getAsJsonObject();
-		MLResultsList mlResultsList = gson.fromJson(rootObject, MLResultsList.class);
+		MLResultsList mlResultsList = gson.fromJson(rootObject,
+				MLResultsList.class);
 		return mlResultsList;
 	}
 
