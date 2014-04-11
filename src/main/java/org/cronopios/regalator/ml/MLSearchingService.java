@@ -1,8 +1,6 @@
 package org.cronopios.regalator.ml;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -12,7 +10,6 @@ import org.cronopios.regalator.GiftItem;
 import org.cronopios.regalator.GiftItemSearchingService;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -26,6 +23,7 @@ public class MLSearchingService implements GiftItemSearchingService {
 	private Meli meli = new Meli((Integer) 0, "");
 	private JsonParser parser = new JsonParser();
 	private Random random = new Random(0);
+	private Gson gson = new Gson();
 
 	public MLSearchingService() {
 	}
@@ -38,7 +36,6 @@ public class MLSearchingService implements GiftItemSearchingService {
 
 		JsonElement root = this.getParser().parse(responseBody);
 		JsonObject rootObject = root.getAsJsonObject();
-		Gson gson = new Gson();
 		MLResultsList mlResultsList = gson.fromJson(rootObject, MLResultsList.class);
 		return mlResultsList;
 	}
@@ -53,30 +50,16 @@ public class MLSearchingService implements GiftItemSearchingService {
 				results = search.getResults();
 				category = category.getParent();
 			}
-			Ordering<MLItem> ordering = Ordering.from(new Comparator<MLItem>() {
-				@Override
-				public int compare(MLItem x, MLItem y) {
-					if (x.getCondition().equals("new") && !y.getCondition().equals("new")) {
-						return -1;
-					}
-					if (y.getCondition().equals("new") && !x.getCondition().equals("new")) {
-						return 1;
-					}
-
-					if (x.getListing_type_id().equals("gold") && !y.getListing_type_id().equals("gold")) {
-						return -1;
-					}
-					if (y.getListing_type_id().equals("gold") && !x.getListing_type_id().equals("gold")) {
-						return 1;
-					}
-
-					return 0;
-				}
-			});
-			// Collections.sort(results, ordering);
 			if (results.isEmpty())
 				return ListUtils.EMPTY_LIST;
 			MLItem mlItem = results.get(random.nextInt(results.size()));
+
+			Response response = meli.get("/items/" + mlItem.getId());
+			String responseBody = response.getResponseBody();
+			JsonElement root = parser.parse(responseBody);
+			JsonObject rootObject = root.getAsJsonObject();
+			mlItem = gson.fromJson(rootObject, MLItem.class);
+
 			System.out.println("gift item drawn");
 			return Lists.newArrayList(mlItem);
 		} catch (MeliException e) {
