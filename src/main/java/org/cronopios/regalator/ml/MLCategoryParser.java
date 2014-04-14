@@ -87,6 +87,7 @@ public class MLCategoryParser {
 				System.out.println("Unknown category: " + catId);
 			} else {
 				mlCategory.setRegalableItems(itemIds);
+				System.out.println(mlCategory);
 				if (mlCategory.isLeaf()) {
 					leaves++;
 				} else {
@@ -125,7 +126,7 @@ public class MLCategoryParser {
 		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(allMlCategories, 1d);
 		for (MLCategory mlCategory : allMlCategories) {
 			int size = mlCategory.getRegalableItems().size();
-			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory) * size == 0 ? 1 : size * 10);
+			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory) * size == 0 ? 1 : 10);
 		}
 	}
 
