@@ -13,6 +13,7 @@ import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.stat.Frequency;
 import org.cronopios.regalator.ml.MLCategory;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -389,6 +390,12 @@ public class KernelRegressionBasedGiftRecommender<T> implements
 
 	public void setCertaintyKernel(UnivariateFunction certaintyKernel) {
 		this.certaintyKernel = certaintyKernel;
+	}
+
+	@Override
+	public void filterGifts(Predicate<T> filter) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

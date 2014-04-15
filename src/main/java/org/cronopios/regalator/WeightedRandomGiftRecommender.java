@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -111,6 +112,12 @@ public class WeightedRandomGiftRecommender<T> implements GiftRecommender<T> {
 
 	public void setK(int k) {
 		this.k = k;
+	}
+
+	@Override
+	public void filterGifts(Predicate<T> filter) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

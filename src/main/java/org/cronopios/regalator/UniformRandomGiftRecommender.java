@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 public class UniformRandomGiftRecommender<T> implements GiftRecommender<T> {
@@ -38,6 +39,12 @@ public class UniformRandomGiftRecommender<T> implements GiftRecommender<T> {
 
 	public void setRandom(Random random) {
 		this.random = random;
+	}
+
+	@Override
+	public void filterGifts(Predicate<T> filter) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

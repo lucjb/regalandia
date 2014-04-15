@@ -1,7 +1,6 @@
 package org.cronopios.regalator.ml;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -9,7 +8,6 @@ import org.apache.commons.collections.ListUtils;
 import org.cronopios.regalator.AbstractCanonicalCategory;
 import org.cronopios.regalator.CanonicalCategory;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class MLCategory extends AbstractCanonicalCategory {

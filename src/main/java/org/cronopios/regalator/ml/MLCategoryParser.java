@@ -2,7 +2,6 @@ package org.cronopios.regalator.ml;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,8 +17,10 @@ import org.cronopios.regalator.CanonicalCategoryWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
 import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -113,9 +114,6 @@ public class MLCategoryParser {
 		new MLVipSubDomainFilter("terreno").filter(mlCategories);
 		new MLVipSubDomainFilter("vehiculo").filter(mlCategories);
 
-		// new MLTagsFilter().filter(mlCategories);
-		// new OtrosFilter().filter(mlCategories);
-
 		new FlagBasedBrandFilter().filter(allMlCategories);
 		this.populateWeights(allMlCategories);
 		new NoLeafFilter().filter(mlCategories);
@@ -124,9 +122,22 @@ public class MLCategoryParser {
 
 	private void populateWeights(List<MLCategory> allMlCategories) {
 		CanonicalCategoryWeighter mlCategoryWeighter = new CanonicalCategoryWeighter(allMlCategories, 1d);
+		Multimap<String, MLCategory> tagCats = HashMultimap.create();
 		for (MLCategory mlCategory : allMlCategories) {
+			List<String> tags = mlCategory.getSettings().getTags();
+			for (String tag : tags) {
+				tagCats.put(tag, mlCategory);
+			}
 			int size = mlCategory.getRegalableItems().size();
-			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory) * size == 0 ? 1 : 10);
+			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory) * size == 0 ? 1 : 20);
+		}
+
+		Set<String> keySet = tagCats.keySet();
+		for (String tag : keySet) {
+			Collection<MLCategory> collection = tagCats.get(tag);
+			System.out.println(tag + " " + collection.size());
+			if (!collection.isEmpty())
+				System.out.println(collection.iterator().next());
 		}
 	}
 

@@ -1,6 +1,7 @@
 package org.cronopios.regalator;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -8,6 +9,7 @@ import java.util.SortedMap;
 
 import org.apache.commons.math3.stat.Frequency;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -198,6 +200,21 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 
 	public void setGiftWeighter(GiftWeighter<T> giftWeighter) {
 		this.giftWeighter = giftWeighter;
+	}
+
+	@Override
+	public void filterGifts(Predicate<T> filter) {
+		int count = 0;
+		Collection<GiftRecommendation<T>> space2 = this.getSpace();
+		for (Iterator<GiftRecommendation<T>> iterator = space2.iterator(); iterator.hasNext();) {
+			GiftRecommendation<T> giftRecommendation = iterator.next();
+			T gift = giftRecommendation.getGift();
+			if (filter.apply(gift)) {
+				iterator.remove();
+				count++;
+			}
+		}
+		System.out.println(filter + " filtered " + count + " gifts.");
 	}
 
 }
