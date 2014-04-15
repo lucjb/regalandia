@@ -1,10 +1,12 @@
 package org.cronopios.regalator;
 
+import java.util.List;
+
 public interface GiftItem {
 
 	public String getTitle();
 
-	public String getImage();
+	public List<String> getImages();
 
 	public String getExternalURL();
 

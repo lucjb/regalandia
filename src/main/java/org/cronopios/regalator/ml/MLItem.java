@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.cronopios.regalator.GiftItem;
 
+import com.google.common.collect.Lists;
+
 public class MLItem implements GiftItem {
 
 	private String id;
@@ -74,12 +76,13 @@ public class MLItem implements GiftItem {
 	}
 
 	@Override
-	public String getImage() {
-		if (this.getPictures().isEmpty()) {
-			return this.getThumbnail();
-		} else {
-			return this.getPictures().get(0).getUrl();
+	public List<String> getImages() {
+		List<String> images = Lists.newArrayList();
+		List<MLPicture> pictures2 = this.getPictures();
+		for (MLPicture mlPicture : pictures2) {
+			images.add(mlPicture.getUrl());
 		}
+		return images;
 	}
 
 	@Override
