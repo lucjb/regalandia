@@ -17,7 +17,7 @@ public class MLCategory extends AbstractCanonicalCategory {
 	private int total_items_in_this_category;
 	private String picture;
 	private MLSettings settings;
-	private List<String> regalableItems = ListUtils.EMPTY_LIST;
+	private transient List<String> regalableItems = ListUtils.EMPTY_LIST;
 
 	@Override
 	public String toString() {

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -88,7 +91,6 @@ public class MLCategoryParser {
 				System.out.println("Unknown category: " + catId);
 			} else {
 				mlCategory.setRegalableItems(itemIds);
-				System.out.println(mlCategory);
 				if (mlCategory.isLeaf()) {
 					leaves++;
 				} else {
@@ -118,6 +120,31 @@ public class MLCategoryParser {
 		this.populateWeights(allMlCategories);
 		new NoLeafFilter().filter(mlCategories);
 		System.out.println("ML Candidate categories: " + mlCategories.size());
+
+		for (MLCategory mlCategory : mlCategories) {
+			List<MLCategory> p = Lists.newArrayList();
+			for (MLCategory ancestor : mlCategory.getPath_from_root()) {
+				MLCategory e = new MLCategory();
+				e.setId(ancestor.getId());
+				e.setName(ancestor.getName());
+				e.setSettings(ancestor.getSettings());
+				p.add(e);
+			}
+			mlCategory.setPath_from_root(p);
+		}
+		Gson gson = new Gson();
+		try {
+			FileWriter writer = new FileWriter(new File("filtered-ml-categories.json"));
+			gson.toJson(mlCategories, mlCategories.getClass(), writer);
+			writer.flush();
+			writer.close();
+		} catch (JsonIOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private void populateWeights(List<MLCategory> allMlCategories) {
@@ -132,13 +159,6 @@ public class MLCategoryParser {
 			mlCategory.setWeight(mlCategoryWeighter.weight(mlCategory) * size == 0 ? 1 : 20);
 		}
 
-		Set<String> keySet = tagCats.keySet();
-		for (String tag : keySet) {
-			Collection<MLCategory> collection = tagCats.get(tag);
-			System.out.println(tag + " " + collection.size());
-			if (!collection.isEmpty())
-				System.out.println(collection.iterator().next());
-		}
 	}
 
 	private void populateChildrenAndAncestors(List<MLCategory> allMlCategories, Map<String, MLCategory> idCat) {
@@ -171,5 +191,15 @@ public class MLCategoryParser {
 
 	public List<MLCategory> parseMLCategories() throws IOException {
 		return this.parseMLCategories("ml-categories-ar.json");
+	}
+
+	public List<MLCategory> parseCachedMLCategories() throws IOException {
+		Reader fileRader = new InputStreamReader(this.getClass().getResourceAsStream("filtered-ml-categories.json"));
+		Gson gson = new Gson();
+		Type collectionType = new TypeToken<List<MLCategory>>() {
+		}.getType();
+		List<MLCategory> allMlCategories = gson.fromJson(fileRader, collectionType);
+		System.out.println("Parsed " + allMlCategories.size() + " ML  categories.");
+		return allMlCategories;
 	}
 }

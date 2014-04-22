@@ -1,6 +1,7 @@
 package org.cronopios.regalator.ml;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -45,10 +46,12 @@ public class MLSearchingService implements GiftItemSearchingService {
 		try {
 			MLResultsList search = this.searchCategory(category);
 			List<MLItem> results = search.getResults();
-			while (results.isEmpty() && !category.isRoot()) {
-				search = this.searchCategory(category.getParent());
+			System.out.println(category);
+			List<? extends CanonicalCategory> pathFromRoot = category.getPathFromRoot();
+			for (Iterator iterator = pathFromRoot.iterator(); results.isEmpty() && iterator.hasNext();) {
+				CanonicalCategory ancestor = (CanonicalCategory) iterator.next();
+				search = this.searchCategory(ancestor);
 				results = search.getResults();
-				category = category.getParent();
 			}
 			if (results.isEmpty())
 				return ListUtils.EMPTY_LIST;
