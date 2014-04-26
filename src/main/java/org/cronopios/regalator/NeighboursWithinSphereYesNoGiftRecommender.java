@@ -28,7 +28,6 @@ public class NeighboursWithinSphereYesNoGiftRecommender<T> extends KNearestSpher
 			if (distance < 0.6) {
 				neighbourhood.add(prevRecommendation);
 			}
-
 		}
 		return neighbourhood;
 	}

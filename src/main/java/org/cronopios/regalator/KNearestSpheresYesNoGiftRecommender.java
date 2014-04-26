@@ -54,14 +54,11 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 			double weight = this.getGiftWeighter().weight(giftRecommendation.getGift());
 			giftRecommendation.setRecommenderScore(weight / this.getSpace().size());
 		}
-		Frequency f = new Frequency();
 		for (GiftRecommendation<T> giftRecommendation : this.getSpace()) {
 			if (giftRecommendation.getUserScore() == null) {
-				double neighboursCount = this.computeRecommenderScore(giftRecommendation, previousRecommendations);
-				f.addValue(neighboursCount);
+				this.computeRecommenderScore(giftRecommendation, previousRecommendations);
 			}
 		}
-		System.out.println(f);
 		this.normalizeRecommenderScore();
 
 		return this.drawRecommendations(n, this.makeGiftDistribution());
