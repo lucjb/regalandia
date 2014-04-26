@@ -42,15 +42,15 @@ public class MLSearchingService implements GiftItemSearchingService {
 	}
 
 	@Override
-	public List<? extends GiftItem> search(CanonicalCategory category) {
+	public List<? extends GiftItem> search(CanonicalCategory category, Integer minPrice, Integer maxPrice) {
 		try {
-			MLResultsList search = this.searchCategory(category);
+			MLResultsList search = this.searchCategory(category, minPrice, maxPrice);
 			List<MLItem> results = search.getResults();
 			System.out.println(category);
 			List<? extends CanonicalCategory> pathFromRoot = category.getPathFromRoot();
 			for (Iterator iterator = pathFromRoot.iterator(); results.isEmpty() && iterator.hasNext();) {
 				CanonicalCategory ancestor = (CanonicalCategory) iterator.next();
-				search = this.searchCategory(ancestor);
+				search = this.searchCategory(ancestor, minPrice, maxPrice);
 				results = search.getResults();
 			}
 			if (results.isEmpty())
@@ -91,12 +91,20 @@ public class MLSearchingService implements GiftItemSearchingService {
 		this.parser = parser;
 	}
 
-	public MLResultsList searchCategory(CanonicalCategory category) throws MeliException, IOException {
+	public MLResultsList searchCategory(CanonicalCategory category, Integer minPrice, Integer maxPrice) throws MeliException, IOException {
 		FluentStringsMap params = new FluentStringsMap();
 		params.add("category", category.getId());
 		params.add("condition", "new");
 		params.add("limit", "200");
-		params.add("power_seller", "true");
+		params.add("power_seller", "yes");
+		params.add("buying_mode", "buy_it_now");
+		params.add("has_pictures", "yes");
+		if (minPrice == null) {
+			minPrice = 0;
+		}
+		if (maxPrice != null) {
+			params.add("price", minPrice.toString() + "-" + maxPrice.toString());
+		}
 		Response response = this.getMeli().get("/sites/MLA/search", params);
 		String responseBody = response.getResponseBody();
 		JsonElement root = this.getParser().parse(responseBody);

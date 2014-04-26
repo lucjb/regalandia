@@ -7,7 +7,7 @@ public class MLSettings {
 	private String mirror_category;
 	private String vip_subdomain;
 	private boolean adult_content;
-	
+	private boolean listing_allowed;
 	public List<String> getTags() {
 		return tags;
 	}
@@ -38,6 +38,14 @@ public class MLSettings {
 
 	public void setAdult_content(boolean adult_content) {
 		this.adult_content = adult_content;
+	}
+
+	public boolean isListing_allowed() {
+		return listing_allowed;
+	}
+
+	public void setListing_allowed(boolean listing_allowed) {
+		this.listing_allowed = listing_allowed;
 	}
 
 }

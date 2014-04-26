@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.cronopios.regalator.CanonicalCategory;
 import org.cronopios.regalator.CanonicalCategoryWeighter;
 import org.cronopios.regalator.filters.NoLeafFilter;
 import org.cronopios.regalator.ml.brands.FlagBasedBrandFilter;
@@ -31,6 +32,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class MLCategoryParser {
+
+	public static void main(String[] args) throws IOException {
+		MLCategoryParser mlCategoryParser = new MLCategoryParser();
+		List<MLCategory> mlCategories = mlCategoryParser.parseMLCategories();
+		mlCategoryParser.filterAndWeight(mlCategories);
+
+		Collection<? extends CanonicalCategory> r = mlCategories;
+	}
 
 	private static void exportCategories(List<MLCategory> allMlCategories) throws IOException {
 		Writer fileWriter = new FileWriter(new File("mlcattree.txt"));
@@ -120,7 +129,23 @@ public class MLCategoryParser {
 		this.populateWeights(allMlCategories);
 		new NoLeafFilter().filter(mlCategories);
 		System.out.println("ML Candidate categories: " + mlCategories.size());
+		int ac = 0;
+		int la = 0;
+		for (MLCategory mlCategory : mlCategories) {
+			MLSettings settings = mlCategory.getSettings();
+			if (settings.isAdult_content())
+				ac++;
+			if (settings.isListing_allowed())
+				la++;
+			else {
+				System.out.println(mlCategory);
+			}
+		}
+		System.out.println("Listing Allowed " + la + ", adult content: " + ac);
 
+	}
+
+	private void generateCachedMLCategories(Collection<? extends MLCategory> mlCategories) {
 		for (MLCategory mlCategory : mlCategories) {
 			List<MLCategory> p = Lists.newArrayList();
 			for (MLCategory ancestor : mlCategory.getPath_from_root()) {
