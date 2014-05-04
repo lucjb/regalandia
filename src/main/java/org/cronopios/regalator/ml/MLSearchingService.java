@@ -3,6 +3,7 @@ package org.cronopios.regalator.ml;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 
 import org.apache.commons.collections.ListUtils;
@@ -48,8 +49,8 @@ public class MLSearchingService implements GiftItemSearchingService {
 			List<MLItem> results = search.getResults();
 			System.out.println(category);
 			List<? extends CanonicalCategory> pathFromRoot = category.getPathFromRoot();
-			for (Iterator iterator = pathFromRoot.iterator(); results.isEmpty() && iterator.hasNext();) {
-				CanonicalCategory ancestor = (CanonicalCategory) iterator.next();
+			for (ListIterator iterator = pathFromRoot.listIterator(pathFromRoot.size()); results.isEmpty() && iterator.hasPrevious();) {
+				CanonicalCategory ancestor = (CanonicalCategory) iterator.previous();
 				search = this.searchCategory(ancestor, minPrice, maxPrice);
 				results = search.getResults();
 			}
@@ -96,7 +97,7 @@ public class MLSearchingService implements GiftItemSearchingService {
 		params.add("category", category.getId());
 		params.add("condition", "new");
 		params.add("limit", "200");
-		params.add("power_seller", "yes");
+		// params.add("power_seller", "yes");
 		params.add("buying_mode", "buy_it_now");
 		params.add("has_pictures", "yes");
 		if (minPrice == null) {

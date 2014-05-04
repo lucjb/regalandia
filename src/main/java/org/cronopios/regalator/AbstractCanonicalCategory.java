@@ -10,7 +10,7 @@ public abstract class AbstractCanonicalCategory implements CanonicalCategory {
 
 	@Override
 	public String toString() {
-		return this.getTitle();
+		return this.getId() + ", " + this.getTitle();
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public abstract class AbstractCanonicalCategory implements CanonicalCategory {
 	}
 
 	public boolean isFor(String categoryPathElementSubstring) {
-		if (this.getName().equals(categoryPathElementSubstring))
+		if (this.getName().contains(categoryPathElementSubstring))
 			return true;
 		if (this.getPathFromRoot() != null) {
 			List<? extends CanonicalCategory> path_from_root2 = this.getPathFromRoot();
@@ -80,6 +80,8 @@ public abstract class AbstractCanonicalCategory implements CanonicalCategory {
 
 	@Override
 	public String getTitle() {
+		if (this.getPathFromRoot() == null)
+			return this.getName();
 		StringBuilder ts = new StringBuilder();
 		for (CanonicalCategory ancestor : this.getPathFromRoot()) {
 			ts.append(ancestor.getName()).append(">");

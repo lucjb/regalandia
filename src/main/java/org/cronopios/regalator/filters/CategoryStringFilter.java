@@ -4,9 +4,10 @@ import java.util.Collection;
 
 import org.cronopios.regalator.CanonicalCategory;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
-public class CategoryStringFilter extends AbstractCanonicalCategoryFilter<CanonicalCategory> {
+public class CategoryStringFilter extends AbstractCanonicalCategoryFilter<CanonicalCategory> implements Predicate<CanonicalCategory> {
 
 	String[] namesInPath;
 
@@ -19,7 +20,7 @@ public class CategoryStringFilter extends AbstractCanonicalCategoryFilter<Canoni
 		Collection<CanonicalCategory> selection = Lists.newArrayList();
 
 		for (CanonicalCategory category : categories) {
-			if (allNamesInPath(category)) {
+			if (this.allNamesInPath(category)) {
 				selection.add(category);
 			}
 		}
@@ -41,6 +42,11 @@ public class CategoryStringFilter extends AbstractCanonicalCategoryFilter<Canoni
 
 	public void setNamesInPath(String[] namesInPath) {
 		this.namesInPath = namesInPath;
+	}
+
+	@Override
+	public boolean apply(CanonicalCategory input) {
+		return this.allNamesInPath(input);
 	}
 
 }

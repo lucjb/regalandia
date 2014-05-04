@@ -8,8 +8,11 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import org.apache.commons.math3.stat.Frequency;
+import org.cronopios.regalator.filters.CategoryStringFilter;
+import org.cronopios.regalator.ml.MLTagsPredicate;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,18 +53,38 @@ public class KNearestSpheresYesNoGiftRecommender<T> implements GiftRecommender<T
 	@Override
 	public Set<GiftRecommendation<T>> recommend(Set<GiftRecommendation<T>> previousRecommendations, int n) {
 		System.out.println("previousRecommendations: " + +previousRecommendations.size());
-		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
-			double weight = this.getGiftWeighter().weight(giftRecommendation.getGift());
-			giftRecommendation.setRecommenderScore(weight / this.getSpace().size());
-		}
+
 		for (GiftRecommendation<T> giftRecommendation : this.getSpace()) {
 			if (giftRecommendation.getUserScore() == null) {
 				this.computeRecommenderScore(giftRecommendation, previousRecommendations);
 			}
 		}
+		for (GiftRecommendation<T> giftRecommendation : previousRecommendations) {
+			double weight = this.getGiftWeighter().weight(giftRecommendation.getGift());
+			giftRecommendation.setRecommenderScore(weight / this.getSpace().size());
+		}
 		this.normalizeRecommenderScore();
 
 		return this.drawRecommendations(n, this.makeGiftDistribution());
+	}
+
+	private void boostSelected() {
+		int count = 0;
+
+		Collection<GiftRecommendation<T>> space2 = this.getSpace();
+		Predicate<CanonicalCategory> filter = Predicates.or(new MLTagsPredicate("girl"), new CategoryStringFilter("Niñas"));
+		for (Iterator<GiftRecommendation<T>> iterator = space2.iterator(); iterator.hasNext();) {
+			GiftRecommendation<T> giftRecommendation = iterator.next();
+			T gift = giftRecommendation.getGift();
+			CanonicalCategory gift2 = (CanonicalCategory) gift;
+			if (filter.apply(gift2)) {
+				double weight = this.getGiftWeighter().weight(giftRecommendation.getGift());
+
+				giftRecommendation.setRecommenderScore(500d * weight / this.getSpace().size());
+				count++;
+			}
+		}
+		System.out.println(filter + " filtered " + count + " gifts.");
 	}
 
 	private Set<GiftRecommendation<T>> drawRecommendations(int n, SimpleCategoricalProbabilityDistribution<GiftRecommendation<T>> probabilityDistribution) {
